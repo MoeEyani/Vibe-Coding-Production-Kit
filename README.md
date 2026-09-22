@@ -50,6 +50,20 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 The generator creates `docs/tasks/accept-invite.md` with source-of-truth links, acceptance criteria, scope boundaries, security questions, failure modes, test plan, rollout/recovery, a plan-before-code section, independent review checklist, and the verification commands actually configured in `AGENTS.md`. See [`docs/TASK-PACKS.md`](docs/TASK-PACKS.md).
 
+## Gate readiness before planning and implementation
+
+Do not treat the existence of a task file as approval to code. Check the two readiness stages explicitly:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production ready accept-invite --stage plan
+
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production ready accept-invite --stage implement
+```
+
+The planning gate blocks missing foundations; the implementation gate also requires resolved boundaries, security/privacy, failure modes, observability, testing, rollout/recovery, and a concrete plan. The command returns `PASS / WARN / FAIL` findings with remediation rather than hiding gaps behind a score. See [`docs/TASK-READINESS.md`](docs/TASK-READINESS.md).
+
 ## Build the right context for each AI phase
 
 Instead of pasting the whole repository into a coding agent, build a bounded context pack from the task and its authoritative references:
@@ -298,6 +312,7 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 ## Roadmap
 
 - [x] Context-aware task pack generator
+- [x] Two-stage task readiness gate
 - [x] Phase-specific bounded context pack builder
 - [x] Worked reference vertical slice using the full workflow
 - [x] Read-only `doctor` audit with human and JSON output
