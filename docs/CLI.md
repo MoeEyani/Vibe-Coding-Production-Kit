@@ -18,6 +18,14 @@ npx vibe-coding-production init
 
 The installed executable is also available as `vcp`.
 
+To audit an existing repository without writing files:
+
+```bash
+vcp doctor .
+```
+
+See [`DOCTOR.md`](DOCTOR.md) for JSON output and strict CI behavior.
+
 ## Interactive setup
 
 ```bash
@@ -50,6 +58,15 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent copilot --ye
 npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
 ```
 
+## Create a bounded task pack
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production task accept-invite --title "Accept invitation"
+```
+
+The task generator writes `docs/tasks/<slug>.md`, refuses overwrite unless `--force` is used, supports `--dry-run`, and imports concrete verification commands from `AGENTS.md`. See [`TASK-PACKS.md`](TASK-PACKS.md).
+
 ## Safety behavior
 
 The CLI is intentionally conservative:
@@ -71,6 +88,8 @@ Before using `--force`, inspect the reported conflicts. The CLI never treats an 
 --force           overwrite framework-managed files
 --no-github       skip GitHub issue/PR/workflow files
 --dry-run         preview without writing
+--title <text>    task title
+--dir <path>      task target repository (default: current directory)
 --help, -h        show help
 --version, -v     show version
 ```

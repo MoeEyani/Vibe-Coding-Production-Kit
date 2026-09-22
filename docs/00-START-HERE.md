@@ -48,3 +48,13 @@ See `docs/CLI.md` for safe overwrite behavior, tool adapters, and non-interactiv
 - [ ] Rollback/recovery known
 - [ ] Observability in place
 - [ ] Critical journeys verified
+
+## Day-to-day feature work
+
+Once the source-of-truth documents are established, create bounded implementation work with:
+
+```bash
+vcp task feature-slug --title "Feature outcome"
+```
+
+Then fill the generated implementation plan before editing code, implement only that scope, run the embedded verification commands, request independent review, and use `vcp doctor .` to audit the repository engineering system.
