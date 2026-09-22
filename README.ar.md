@@ -59,6 +59,25 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 مرحلة `plan` تمنع التخطيط إذا كان Outcome أو Source of Truth أو Acceptance Criteria أو حدود الـscope ناقصة. مرحلة `implement` أكثر صرامة: تشترط أيضاً حسم الحدود المعمارية والبيانات والتكاملات، الأمن والخصوصية، الحالات السلبية، Observability، خطة الاختبارات، rollout/recovery، وخطة تنفيذ فعلية. التقرير يستخدم `PASS / WARN / FAIL` مع طريقة الإصلاح ولا يخفي النواقص وراء رقم واحد. التفاصيل في `docs/TASK-READINESS.md`.
 
+## حوّل عبارة «شغّلت الاختبارات» إلى Evidence
+
+اعرض أولاً أوامر التحقق الدقيقة المرتبطة بالـTask بدون تنفيذ أي شيء:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production verify accept-invite
+```
+
+التنفيذ يحتاج `--run` صريحاً، ويرفض البدء إذا لم تجتز الـTask بوابة `ready --stage implement`:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production verify accept-invite --run \
+  --output .vcp/evidence/accept-invite.json
+```
+
+تعمل الأوامر بالتسلسل وتتوقف بعد أول فشل. ملف الـEvidence يسجل الأمر الفعلي والحالة وexit code والمدة والـtimeout، لكنه لا يحفظ stdout/stderr افتراضياً لتقليل خطر تسريب secrets أو PII. التفاصيل في `docs/VERIFICATION-EVIDENCE.md`.
+
 ## ابنِ Context محدداً لكل مرحلة
 
 بدلاً من إرسال المستودع كاملاً إلى الـAI، اجمع أقل سياق كافٍ للمهمة والمرحلة:
