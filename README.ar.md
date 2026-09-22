@@ -26,6 +26,8 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claud
 
 الـCLI لا يعتمد على مكتبات runtime خارجية، ولا يكتب فوق ملفات موجودة إلا عند استخدام `--force` صراحة. كما يستطيع `--stack auto` اكتشاف TypeScript وPython وGo وملء أوامر التحقق التي يمكن إثباتها من ملفات المشروع فقط. ويمكن استخدام `--dry-run` لمشاهدة ما سيتم إنشاؤه قبل أي تعديل. التفاصيل في `docs/CLI.md` و`docs/STACK-PROFILES.md`.
 
+**إذا كانت هذه أول مرة تستخدم المشروع:** ابدأ من [`docs/QUICKSTART.md`](docs/QUICKSTART.md) لمسار عملي من التهيئة إلى Task محددة، readiness، context، verification evidence، والمراجعة المستقلة.
+
 ## فحص مشروع موجود
 
 يوجد أيضاً أمر `doctor` للقراءة فقط، يميّز بين وجود القوالب وبين إعدادها فعلياً:
