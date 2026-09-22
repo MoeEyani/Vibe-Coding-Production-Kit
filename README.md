@@ -29,6 +29,8 @@ The CLI is **zero-runtime-dependency**, refuses to overwrite existing managed fi
 
 > Planned npm shorthand after the first package release: `npx vibe-coding-production init`
 
+**New here?** Follow the end-to-end [`10-minute Quickstart`](docs/QUICKSTART.md) to go from bootstrap → bounded task → readiness gates → AI context → verification evidence → independent review.
+
 ## Audit an existing project
 
 The CLI also includes a read-only doctor that checks whether the engineering system is actually configured—not merely copied:
