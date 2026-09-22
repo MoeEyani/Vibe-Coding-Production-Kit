@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-22
+
+### Added
+- Read-only `doctor` command with `PASS / WARN / FAIL` findings.
+- JSON output for automation and `--strict` mode for CI enforcement.
+- Detection of unresolved AGENTS verification commands and untouched starter-template signals.
+- Doctor guidance that deliberately avoids a misleading single readiness score.
+
 ## [0.2.0] - 2026-09-22
 
 ### Added
