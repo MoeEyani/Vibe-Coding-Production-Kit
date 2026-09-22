@@ -7,6 +7,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { initProject } from '../lib/init.mjs';
 import { doctorExitCode, runDoctor } from '../lib/doctor.mjs';
+import { createTaskPack } from '../lib/task.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -160,4 +161,57 @@ test('doctor reports explicit stack commands as resolved', async () => {
   const commands = report.checks.find((item) => item.id === 'commands');
   assert.equal(report.stack, 'typescript');
   assert.equal(commands.status, 'pass');
+});
+
+
+test('task generator creates a bounded task and imports configured verification commands', async () => {
+  const target = await tempDir();
+  await writeFile(path.join(target, 'tsconfig.json'), '{}\n');
+  await writeFile(path.join(target, 'package.json'), JSON.stringify({
+    scripts: {
+      lint: 'eslint .',
+      typecheck: 'tsc --noEmit',
+      test: 'node --test',
+      build: 'tsc'
+    }
+  }));
+  await writeFile(path.join(target, 'package-lock.json'), '{}\n');
+  await initProject({ targetDir: target, agent: 'codex', stack: 'auto', includeGitHub: false });
+
+  const result = await createTaskPack({
+    targetDir: target,
+    slug: 'accept-invite',
+    title: 'Accept invitation'
+  });
+  const task = await readFile(path.join(target, result.relative), 'utf8');
+
+  assert.equal(result.relative, path.join('docs', 'tasks', 'accept-invite.md'));
+  assert.match(task, /# Task — Accept invitation/);
+  assert.match(task, /`LINT_COMMAND`: `npm run lint`/);
+  assert.match(task, /`TYPECHECK_COMMAND`: `npm run typecheck`/);
+  assert.match(task, /Implementation plan/);
+  assert.match(task, /Independent review checklist/);
+});
+
+test('task generator refuses overwrite and supports dry-run', async () => {
+  const target = await tempDir();
+  await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await createTaskPack({ targetDir: target, slug: 'billing-retry' });
+
+  await assert.rejects(
+    createTaskPack({ targetDir: target, slug: 'billing-retry' }),
+    /Refusing to overwrite existing task/
+  );
+
+  const preview = await createTaskPack({ targetDir: target, slug: 'new-task', dryRun: true });
+  assert.equal(preview.dryRun, true);
+  await assert.rejects(readFile(path.join(target, preview.relative), 'utf8'));
+});
+
+test('task generator validates kebab-case slugs', async () => {
+  const target = await tempDir();
+  await assert.rejects(
+    createTaskPack({ targetDir: target, slug: 'Bad Task' }),
+    /lowercase kebab-case/
+  );
 });
