@@ -39,6 +39,18 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-produ
 
 It reports concrete `PASS / WARN / FAIL` findings for agent instructions, unresolved verification commands, core source-of-truth documents, untouched template markers, CI, and the plan/review loop. Use `--json` for automation or `--strict` to make warnings fail CI. See [`docs/DOCTOR.md`](docs/DOCTOR.md).
 
+## Worked reference project
+
+Want to see the workflow as concrete engineering artifacts instead of blank templates? Start with [`examples/reference-saas-invite/`](examples/reference-saas-invite/). It is a security-sensitive multi-tenant invitation vertical slice with a completed product brief, PRD, user flows, domain/data/architecture decisions, ADR, threat model, test strategy, bounded task, layered code, and negative-path tests.
+
+```bash
+cd examples/reference-saas-invite
+npm test
+npm run check
+```
+
+The example explicitly documents what remains unproven for real production infrastructure.
+
 ## Why this exists
 
 Most AI coding workflows optimize for the first demo. Real software must also survive the 100th feature, the second developer, production incidents, security reviews, migrations, refactors, and years of maintenance.
@@ -263,7 +275,7 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 
 ## Roadmap
 
-- [ ] Example production project using the full workflow
+- [x] Worked reference vertical slice using the full workflow
 - [x] Read-only `doctor` audit with human and JSON output
 - [x] CLI to bootstrap the kit into a repository
 - [x] Evidence-based stack profiles for TypeScript, Python, and Go
