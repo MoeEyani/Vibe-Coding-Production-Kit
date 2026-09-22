@@ -14,6 +14,7 @@ required_files=(
   "docs/TASK-PACKS.md"
   "docs/TASK-READINESS.md"
   "docs/VERIFICATION-EVIDENCE.md"
+  "docs/QUICKSTART.md"
   "docs/CONTEXT-PACKS.md"
   "docs/product/PRODUCT-BRIEF.md"
   "docs/product/PRD.md"
