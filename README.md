@@ -29,6 +29,16 @@ The CLI is **zero-runtime-dependency**, refuses to overwrite existing managed fi
 
 > Planned npm shorthand after the first package release: `npx vibe-coding-production init`
 
+## Audit an existing project
+
+The CLI also includes a read-only doctor that checks whether the engineering system is actually configured—not merely copied:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-production doctor .
+```
+
+It reports concrete `PASS / WARN / FAIL` findings for agent instructions, unresolved verification commands, core source-of-truth documents, untouched template markers, CI, and the plan/review loop. Use `--json` for automation or `--strict` to make warnings fail CI. See [`docs/DOCTOR.md`](docs/DOCTOR.md).
+
 ## Why this exists
 
 Most AI coding workflows optimize for the first demo. Real software must also survive the 100th feature, the second developer, production incidents, security reviews, migrations, refactors, and years of maintenance.
@@ -254,6 +264,7 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 ## Roadmap
 
 - [ ] Example production project using the full workflow
+- [x] Read-only `doctor` audit with human and JSON output
 - [x] CLI to bootstrap the kit into a repository
 - [x] Evidence-based stack profiles for TypeScript, Python, and Go
 - [ ] Mobile stack profiles
