@@ -4,6 +4,19 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-22
+
+### Added
+- Read-only `vcp ready <task>` task-readiness gate with separate `plan` and `implement` stages.
+- Planning gate for outcome, resolvable Source of Truth, concrete acceptance criteria, and explicit scope.
+- Implementation gate for affected boundaries, domain invariants, security/privacy, failure modes, observability, testing, rollout/recovery, and a concrete implementation plan.
+- Human-readable and `--json` reports plus `--strict` warning enforcement for CI/team policy.
+- Repository-root validation for Source of Truth references and detection of unresolved template references.
+- Regression coverage for blank task templates, plan-vs-implement semantics, unsafe references, and CLI JSON output.
+
+### Fixed
+- Readiness parsing now uses horizontal whitespace where required, preventing empty fields or acceptance criteria from accidentally consuming the next Markdown line.
+
 ## [0.6.0] - 2026-09-22
 
 ### Added
