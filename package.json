@@ -1,6 +1,6 @@
 {
   "name": "vibe-coding-production",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Production-grade vibe coding framework and CLI: specs, architecture, agent rules, testing, security, reviews, and delivery from idea to production.",
   "type": "module",
   "bin": {
@@ -20,11 +20,12 @@
     ".github/workflows/validate.yml"
   ],
   "scripts": {
-    "check": "node --check bin/vibe-coding-production.mjs && node --check lib/cli.mjs && node --check lib/init.mjs && node --check lib/adapters.mjs && node --check lib/stacks.mjs",
+    "check": "node --check bin/vibe-coding-production.mjs && node --check lib/cli.mjs && node --check lib/init.mjs && node --check lib/adapters.mjs && node --check lib/stacks.mjs && node --check lib/doctor.mjs",
     "test": "node --test",
     "test:cli": "node --test test/cli.test.mjs",
     "validate": "./scripts/validate-framework.sh && npm run check && npm test",
-    "pack:check": "npm pack --dry-run"
+    "pack:check": "npm pack --dry-run",
+    "doctor": "node bin/vibe-coding-production.mjs doctor ."
   },
   "engines": {
     "node": ">=22"

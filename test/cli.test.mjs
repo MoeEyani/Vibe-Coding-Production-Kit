@@ -6,6 +6,7 @@ import test from 'node:test';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { initProject } from '../lib/init.mjs';
+import { doctorExitCode, runDoctor } from '../lib/doctor.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -114,4 +115,49 @@ test('auto-detects Python tooling only when configuration provides evidence', as
   assert.match(agents, /TYPECHECK_COMMAND=mypy \./);
   assert.match(agents, /UNIT_TEST_COMMAND=python -m pytest/);
   assert.match(agents, /## 15\. Python stack profile/);
+});
+
+
+test('doctor fails when the framework is not installed', async () => {
+  const target = await tempDir();
+  const report = await runDoctor(target);
+
+  assert.ok(report.summary.fail > 0);
+  assert.equal(doctorExitCode(report), 1);
+  assert.ok(report.checks.some((item) => item.id === 'agents' && item.status === 'fail'));
+});
+
+test('doctor warns for untouched templates but passes structural checks after init', async () => {
+  const target = await tempDir();
+  await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: true });
+  const report = await runDoctor(target);
+
+  assert.equal(report.summary.fail, 0);
+  assert.ok(report.summary.warn > 0);
+  assert.equal(doctorExitCode(report), 0);
+  assert.equal(doctorExitCode(report, true), 1);
+  assert.ok(report.checks.some((item) => item.id === 'product-brief' && item.status === 'warn'));
+});
+
+test('doctor reports explicit stack commands as resolved', async () => {
+  const target = await tempDir();
+  await writeFile(path.join(target, 'tsconfig.json'), '{}\n');
+  await writeFile(path.join(target, 'package.json'), JSON.stringify({
+    scripts: {
+      'format:check': 'prettier --check .',
+      lint: 'eslint .',
+      typecheck: 'tsc --noEmit',
+      test: 'node --test',
+      'test:integration': 'node --test test/integration',
+      build: 'tsc',
+      'test:e2e': 'playwright test'
+    }
+  }));
+  await writeFile(path.join(target, 'package-lock.json'), '{}\n');
+  await initProject({ targetDir: target, agent: 'codex', stack: 'auto', includeGitHub: true });
+  const report = await runDoctor(target);
+
+  const commands = report.checks.find((item) => item.id === 'commands');
+  assert.equal(report.stack, 'typescript');
+  assert.equal(commands.status, 'pass');
 });
