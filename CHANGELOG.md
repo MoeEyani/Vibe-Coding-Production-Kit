@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+### Added
+- End-to-end `docs/QUICKSTART.md` covering bootstrap, task creation, readiness, bounded context, verification evidence, review, and repository audit.
+- Ready-to-paste v0.8.0 release notes and GitHub generated-release-notes category configuration.
+
 ## [0.8.0] - 2026-09-22
 
 ### Added
