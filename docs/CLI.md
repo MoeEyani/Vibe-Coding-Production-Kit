@@ -67,6 +67,15 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 The task generator writes `docs/tasks/<slug>.md`, refuses overwrite unless `--force` is used, supports `--dry-run`, and imports concrete verification commands from `AGENTS.md`. See [`TASK-PACKS.md`](TASK-PACKS.md).
 
+## Build a bounded AI context pack
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production context accept-invite --mode plan
+```
+
+`context` combines the task, `AGENTS.md`, the phase-specific operating prompt, and existing files referenced in the task's Source of Truth. Add current implementation files explicitly with repeatable `--include` flags. Print to stdout or use `--output` to save a pack inside the repository. See [`CONTEXT-PACKS.md`](CONTEXT-PACKS.md).
+
 ## Safety behavior
 
 The CLI is intentionally conservative:
@@ -89,7 +98,11 @@ Before using `--force`, inspect the reported conflicts. The CLI never treats an 
 --no-github       skip GitHub issue/PR/workflow files
 --dry-run         preview without writing
 --title <text>    task title
---dir <path>      task target repository (default: current directory)
+--dir <path>      task/context target repository (default: current directory)
+--mode <name>     context mode: plan | implement | review | security | release
+--include <path>  add an explicit context file; repeatable
+--output <path>   write context pack inside the repository instead of stdout
+--max-bytes <n>   maximum context pack bytes; 0 disables the limit
 --help, -h        show help
 --version, -v     show version
 ```
