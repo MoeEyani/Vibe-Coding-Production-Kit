@@ -64,6 +64,25 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 The planning gate blocks missing foundations; the implementation gate also requires resolved boundaries, security/privacy, failure modes, observability, testing, rollout/recovery, and a concrete plan. The command returns `PASS / WARN / FAIL` findings with remediation rather than hiding gaps behind a score. See [`docs/TASK-READINESS.md`](docs/TASK-READINESS.md).
 
+## Turn verification claims into evidence
+
+Preview the exact checks attached to a task before executing anything:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production verify accept-invite
+```
+
+Execution is explicit and is refused until the task passes the implementation-readiness gate:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production verify accept-invite --run \
+  --output .vcp/evidence/accept-invite.json
+```
+
+Commands run sequentially and stop after the first failure. Evidence records the exact command, status, exit code, timeout state, and duration, but deliberately does not persist raw stdout/stderr by default. See [`docs/VERIFICATION-EVIDENCE.md`](docs/VERIFICATION-EVIDENCE.md).
+
 ## Build the right context for each AI phase
 
 Instead of pasting the whole repository into a coding agent, build a bounded context pack from the task and its authoritative references:
@@ -313,6 +332,7 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 
 - [x] Context-aware task pack generator
 - [x] Two-stage task readiness gate
+- [x] Safe verification evidence workflow
 - [x] Phase-specific bounded context pack builder
 - [x] Worked reference vertical slice using the full workflow
 - [x] Read-only `doctor` audit with human and JSON output
