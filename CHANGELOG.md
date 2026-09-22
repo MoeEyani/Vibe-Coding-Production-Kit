@@ -4,6 +4,18 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-22
+
+### Added
+- Safe-by-default `vcp verify <task>` verification plan/evidence workflow.
+- Explicit `--run` consent before repository-controlled shell commands can execute.
+- Implementation-readiness enforcement before verification execution.
+- Sequential command execution with stop-on-first-failure and skipped downstream checks.
+- Optional repository-local JSON evidence with command, timing, exit, signal, timeout, and status metadata without persisted stdout/stderr.
+- Repeatable `--only` command selection and per-command `--timeout-ms`.
+- Preflight output-path and overwrite protection before any command execution.
+- Verification tests covering preview safety, successful evidence, failure stopping, JSON CLI output, output conflicts, and unready-task refusal.
+
 ## [0.7.0] - 2026-09-22
 
 ### Added
