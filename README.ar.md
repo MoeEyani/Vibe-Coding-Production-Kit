@@ -21,10 +21,10 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
 أو لمشروع آخر:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --yes
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --stack auto --yes
 ```
 
-الـCLI لا يعتمد على مكتبات runtime خارجية، ولا يكتب فوق ملفات موجودة إلا عند استخدام `--force` صراحة. ويمكن استخدام `--dry-run` لمشاهدة ما سيتم إنشاؤه قبل أي تعديل. التفاصيل في `docs/CLI.md`.
+الـCLI لا يعتمد على مكتبات runtime خارجية، ولا يكتب فوق ملفات موجودة إلا عند استخدام `--force` صراحة. كما يستطيع `--stack auto` اكتشاف TypeScript وPython وGo وملء أوامر التحقق التي يمكن إثباتها من ملفات المشروع فقط. ويمكن استخدام `--dry-run` لمشاهدة ما سيتم إنشاؤه قبل أي تعديل. التفاصيل في `docs/CLI.md` و`docs/STACK-PROFILES.md`.
 
 ## المسار الكامل
 

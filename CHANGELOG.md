@@ -11,7 +11,9 @@ All notable changes to this project will be documented here.
 - Interactive and non-interactive initialization modes.
 - `--dry-run`, `--force`, and `--no-github` safety controls.
 - Thin agent adapters for Claude Code and GitHub Copilot; Codex and Cursor use `AGENTS.md` directly.
-- CLI tests covering installation, conflicts, directory merging, adapters, dry-run, and installed-framework validation.
+- CLI tests covering installation, conflicts, directory merging, adapters, dry-run, installed-framework validation, and stack detection.
+- Evidence-based stack profiles for TypeScript, Python, and Go.
+- Automatic package-manager/script discovery for TypeScript and tooling discovery for Python.
 - Direct execution from the GitHub repository through `npx` package specs.
 
 ### Changed

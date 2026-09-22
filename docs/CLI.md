@@ -28,7 +28,8 @@ The CLI asks for:
 
 1. target directory;
 2. AI coding tool;
-3. whether GitHub issue/PR/validation files should be installed.
+3. stack profile (auto/generic/typescript/python/go);
+4. whether GitHub issue/PR/validation files should be installed.
 
 ## Non-interactive examples
 
@@ -45,8 +46,8 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent claude --yes
 # GitHub Copilot — adds .github/copilot-instructions.md
 npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent copilot --yes
 
-# Multi-tool repository
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --yes
+# Multi-tool repository with stack auto-detection
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
 ```
 
 ## Safety behavior
@@ -65,6 +66,7 @@ Before using `--force`, inspect the reported conflicts. The CLI never treats an 
 
 ```text
 --agent <name>    generic | codex | cursor | claude | copilot | all
+--stack <name>    auto | generic | typescript | python | go
 --yes, -y         non-interactive mode
 --force           overwrite framework-managed files
 --no-github       skip GitHub issue/PR/workflow files
@@ -76,3 +78,5 @@ Before using `--force`, inspect the reported conflicts. The CLI never treats an 
 ## Requirements
 
 Node.js 22 or newer. The CLI has no runtime dependencies.
+
+See [`STACK-PROFILES.md`](STACK-PROFILES.md) for evidence-based TypeScript, Python, and Go adaptation.

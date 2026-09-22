@@ -3,7 +3,6 @@
 > Build with AI like an engineering team — not like a chat session.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Framework Validation](https://github.com/MoeEyani/vibe-coding-production-kit/actions/workflows/validate.yml/badge.svg)](https://github.com/MoeEyani/vibe-coding-production-kit/actions/workflows/validate.yml)
 [![GitHub stars](https://img.shields.io/github/stars/MoeEyani/vibe-coding-production-kit?style=social)](https://github.com/MoeEyani/vibe-coding-production-kit/stargazers)
 
 **Vibe Coding Production Kit** is a production-minded operating system for AI-assisted software development. It turns vague “vibe coding” into a repeatable engineering workflow built around specifications, architecture, small scoped tasks, tests, security reviews, CI gates, and repository-native AI instructions.
@@ -23,10 +22,10 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
 Or target another repository:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --yes
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --stack auto --yes
 ```
 
-The CLI is **zero-runtime-dependency**, refuses to overwrite existing managed files unless you pass `--force`, and can add thin adapters for Claude Code and GitHub Copilot while Codex and Cursor use `AGENTS.md` directly. See [`docs/CLI.md`](docs/CLI.md).
+The CLI is **zero-runtime-dependency**, refuses to overwrite existing managed files unless you pass `--force`, and can add thin adapters for Claude Code and GitHub Copilot while Codex and Cursor use `AGENTS.md` directly. It also auto-detects TypeScript, Python, and Go projects and fills verification commands only when the repository provides evidence for them. See [`docs/CLI.md`](docs/CLI.md) and [`docs/STACK-PROFILES.md`](docs/STACK-PROFILES.md).
 
 > Planned npm shorthand after the first package release: `npx vibe-coding-production init`
 
@@ -256,7 +255,8 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 
 - [ ] Example production project using the full workflow
 - [x] CLI to bootstrap the kit into a repository
-- [ ] Stack packs for TypeScript, Python, Go, and mobile
+- [x] Evidence-based stack profiles for TypeScript, Python, and Go
+- [ ] Mobile stack profiles
 - [ ] CI adapters for common monorepos
 - [ ] Security checklists mapped to common application classes
 - [ ] Prompt evaluation suite for coding agents
