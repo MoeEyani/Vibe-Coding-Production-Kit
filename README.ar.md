@@ -10,6 +10,22 @@
 
 الإنسان يملك القرارات والنية والمخاطر والمفاضلات. والـAI يساعد في البحث والتخطيط والتنفيذ والاختبار والمراجعة والتوثيق ضمن حدود واضحة.
 
+## تشغيل سريع خلال دقيقة
+
+يمكن تشغيل الـCLI مباشرة من GitHub بدون تثبيت عالمي:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
+```
+
+أو لمشروع آخر:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --yes
+```
+
+الـCLI لا يعتمد على مكتبات runtime خارجية، ولا يكتب فوق ملفات موجودة إلا عند استخدام `--force` صراحة. ويمكن استخدام `--dry-run` لمشاهدة ما سيتم إنشاؤه قبل أي تعديل. التفاصيل في `docs/CLI.md`.
+
 ## المسار الكامل
 
 ```text

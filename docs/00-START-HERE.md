@@ -2,6 +2,14 @@
 
 Use this repository as a repeatable engineering operating system for AI-assisted projects.
 
+For a new repository, the fastest start is:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
+```
+
+See `docs/CLI.md` for safe overwrite behavior, tool adapters, and non-interactive options.
+
 ## Recommended order
 
 ### Before code
