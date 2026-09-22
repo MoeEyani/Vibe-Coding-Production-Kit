@@ -13,6 +13,7 @@ required_files=(
   "docs/STACK-PROFILES.md"
   "docs/TASK-PACKS.md"
   "docs/TASK-READINESS.md"
+  "docs/VERIFICATION-EVIDENCE.md"
   "docs/CONTEXT-PACKS.md"
   "docs/product/PRODUCT-BRIEF.md"
   "docs/product/PRD.md"
