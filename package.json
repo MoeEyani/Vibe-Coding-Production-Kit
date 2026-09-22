@@ -25,7 +25,8 @@
     "test:cli": "node --test test/cli.test.mjs",
     "validate": "./scripts/validate-framework.sh && npm run check && npm test",
     "pack:check": "npm pack --dry-run",
-    "doctor": "node bin/vibe-coding-production.mjs doctor ."
+    "doctor": "node bin/vibe-coding-production.mjs doctor .",
+    "prepublishOnly": "npm run validate"
   },
   "engines": {
     "node": ">=22"
@@ -51,5 +52,8 @@
     "url": "https://github.com/MoeEyani/Vibe-Coding-Production-Kit/issues"
   },
   "homepage": "https://github.com/MoeEyani/Vibe-Coding-Production-Kit#readme",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
