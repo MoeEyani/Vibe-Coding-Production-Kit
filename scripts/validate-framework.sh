@@ -12,6 +12,7 @@ required_files=(
   "docs/DOCTOR.md"
   "docs/STACK-PROFILES.md"
   "docs/TASK-PACKS.md"
+  "docs/TASK-READINESS.md"
   "docs/CONTEXT-PACKS.md"
   "docs/product/PRODUCT-BRIEF.md"
   "docs/product/PRD.md"
