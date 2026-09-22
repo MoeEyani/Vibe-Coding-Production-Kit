@@ -39,6 +39,28 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-produ
 
 It reports concrete `PASS / WARN / FAIL` findings for agent instructions, unresolved verification commands, core source-of-truth documents, untouched template markers, CI, and the plan/review loop. Use `--json` for automation or `--strict` to make warnings fail CI. See [`docs/DOCTOR.md`](docs/DOCTOR.md).
 
+## Create a bounded task before coding
+
+Turn a feature into a repository-native task contract:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production task accept-invite --title "Accept invitation"
+```
+
+The generator creates `docs/tasks/accept-invite.md` with source-of-truth links, acceptance criteria, scope boundaries, security questions, failure modes, test plan, rollout/recovery, a plan-before-code section, independent review checklist, and the verification commands actually configured in `AGENTS.md`. See [`docs/TASK-PACKS.md`](docs/TASK-PACKS.md).
+
+## Build the right context for each AI phase
+
+Instead of pasting the whole repository into a coding agent, build a bounded context pack from the task and its authoritative references:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production context accept-invite --mode plan
+```
+
+Use `--mode implement`, `review`, `security`, or `release` as the task progresses. Add only the affected implementation files with repeatable `--include` flags. Context packs reject paths outside the repository and enforce a size budget by default. See [`docs/CONTEXT-PACKS.md`](docs/CONTEXT-PACKS.md).
+
 ## Worked reference project
 
 Want to see the workflow as concrete engineering artifacts instead of blank templates? Start with [`examples/reference-saas-invite/`](examples/reference-saas-invite/). It is a security-sensitive multi-tenant invitation vertical slice with a completed product brief, PRD, user flows, domain/data/architecture decisions, ADR, threat model, test strategy, bounded task, layered code, and negative-path tests.
@@ -156,7 +178,7 @@ flowchart LR
     I --> J[Release / observe]
 ```
 
-Use:
+Use `vcp context <task> --mode <phase>` to assemble bounded context automatically, or use the prompt files directly:
 
 - [`prompts/02-plan-task.md`](prompts/02-plan-task.md)
 - [`prompts/03-implement-task.md`](prompts/03-implement-task.md)
@@ -275,6 +297,8 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 
 ## Roadmap
 
+- [x] Context-aware task pack generator
+- [x] Phase-specific bounded context pack builder
 - [x] Worked reference vertical slice using the full workflow
 - [x] Read-only `doctor` audit with human and JSON output
 - [x] CLI to bootstrap the kit into a repository
