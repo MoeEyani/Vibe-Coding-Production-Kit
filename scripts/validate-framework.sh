@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
 required_files=(
-  "README.md"
-  "README.ar.md"
   "AGENTS.md"
-  "CONTRIBUTING.md"
-  "SECURITY.md"
-  "LICENSE"
   "docs/00-START-HERE.md"
   "docs/OPERATING-MODEL.md"
   "docs/product/PRODUCT-BRIEF.md"

@@ -12,5 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate repository framework
-        run: ./scripts/validate-framework.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Validate framework and CLI
+        run: npm run validate
+      - name: Verify publish package contents
+        run: npm run pack:check

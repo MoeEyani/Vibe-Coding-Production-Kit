@@ -1,4 +1,10 @@
-.PHONY: validate
+.PHONY: validate test pack-check
 
 validate:
-	./scripts/validate-framework.sh
+	npm run validate
+
+test:
+	npm test
+
+pack-check:
+	npm run pack:check

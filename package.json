@@ -1,0 +1,54 @@
+{
+  "name": "vibe-coding-production",
+  "version": "0.2.0",
+  "description": "Production-grade vibe coding framework and CLI: specs, architecture, agent rules, testing, security, reviews, and delivery from idea to production.",
+  "type": "module",
+  "bin": {
+    "vibe-coding-production": "./bin/vibe-coding-production.mjs",
+    "vcp": "./bin/vibe-coding-production.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "AGENTS.md",
+    "docs/",
+    "prompts/",
+    "examples/",
+    "scripts/validate-framework.sh",
+    ".github/ISSUE_TEMPLATE/",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/workflows/validate.yml"
+  ],
+  "scripts": {
+    "check": "node --check bin/vibe-coding-production.mjs && node --check lib/cli.mjs && node --check lib/init.mjs && node --check lib/adapters.mjs",
+    "test": "node --test",
+    "test:cli": "node --test test/cli.test.mjs",
+    "validate": "./scripts/validate-framework.sh && npm run check && npm test",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "vibe-coding",
+    "ai-coding",
+    "coding-agents",
+    "agentic-coding",
+    "software-engineering",
+    "spec-driven-development",
+    "claude-code",
+    "cursor",
+    "codex",
+    "github-copilot",
+    "production-ready"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoeEyani/Vibe-Coding-Production-Kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MoeEyani/Vibe-Coding-Production-Kit/issues"
+  },
+  "homepage": "https://github.com/MoeEyani/Vibe-Coding-Production-Kit#readme",
+  "license": "MIT"
+}
