@@ -26,6 +26,16 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claud
 
 الـCLI لا يعتمد على مكتبات runtime خارجية، ولا يكتب فوق ملفات موجودة إلا عند استخدام `--force` صراحة. كما يستطيع `--stack auto` اكتشاف TypeScript وPython وGo وملء أوامر التحقق التي يمكن إثباتها من ملفات المشروع فقط. ويمكن استخدام `--dry-run` لمشاهدة ما سيتم إنشاؤه قبل أي تعديل. التفاصيل في `docs/CLI.md` و`docs/STACK-PROFILES.md`.
 
+## فحص مشروع موجود
+
+يوجد أيضاً أمر `doctor` للقراءة فقط، يميّز بين وجود القوالب وبين إعدادها فعلياً:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-production doctor .
+```
+
+يعرض `PASS / WARN / FAIL` لأوامر التحقق، ملفات الـSource of Truth، القوالب التي ما زالت غير مخصصة، CI، ودورة التخطيط/المراجعة. استخدم `--json` للأتمتة و`--strict` لجعل التحذيرات تفشل في CI. التفاصيل في `docs/DOCTOR.md`.
+
 ## المسار الكامل
 
 ```text
