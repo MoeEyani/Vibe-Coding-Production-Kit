@@ -67,6 +67,17 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 The task generator writes `docs/tasks/<slug>.md`, refuses overwrite unless `--force` is used, supports `--dry-run`, and imports concrete verification commands from `AGENTS.md`. See [`TASK-PACKS.md`](TASK-PACKS.md).
 
+## Gate task readiness
+
+A task can be ready to plan before it is ready to implement. Check those stages separately:
+
+```bash
+vcp ready accept-invite --stage plan
+vcp ready accept-invite --stage implement
+```
+
+The planning gate blocks missing outcome, Source of Truth, acceptance criteria, or scope. The implementation gate additionally requires resolved architecture/data/integration boundaries, domain invariants, security/privacy, failure modes, observability, test coverage, rollout/recovery, and an implementation plan. Use `--json` for automation and `--strict` to make warnings non-zero. See [`TASK-READINESS.md`](TASK-READINESS.md).
+
 ## Build a bounded AI context pack
 
 ```bash
@@ -98,6 +109,7 @@ Before using `--force`, inspect the reported conflicts. The CLI never treats an 
 --no-github       skip GitHub issue/PR/workflow files
 --dry-run         preview without writing
 --title <text>    task title
+--stage <name>    readiness stage: plan | implement
 --dir <path>      task/context target repository (default: current directory)
 --mode <name>     context mode: plan | implement | review | security | release
 --include <path>  add an explicit context file; repeatable
