@@ -36,6 +36,26 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-produ
 
 يعرض `PASS / WARN / FAIL` لأوامر التحقق، ملفات الـSource of Truth، القوالب التي ما زالت غير مخصصة، CI، ودورة التخطيط/المراجعة. استخدم `--json` للأتمتة و`--strict` لجعل التحذيرات تفشل في CI. التفاصيل في `docs/DOCTOR.md`.
 
+## أنشئ Task محددة قبل كتابة الكود
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production task accept-invite --title "Accept invitation"
+```
+
+ينشئ الأمر `docs/tasks/accept-invite.md` وفيه مصادر الحقيقة، Acceptance Criteria، حدود الـscope، أسئلة الأمن والـtenant isolation، الحالات الطرفية، خطة الاختبارات، rollout/recovery، قسم تخطيط يجب تعبئته قبل تعديل الكود، checklist للمراجعة المستقلة، وأوامر التحقق الفعلية الموجودة في `AGENTS.md`. التفاصيل في `docs/TASK-PACKS.md`.
+
+## ابنِ Context محدداً لكل مرحلة
+
+بدلاً من إرسال المستودع كاملاً إلى الـAI، اجمع أقل سياق كافٍ للمهمة والمرحلة:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production context accept-invite --mode plan
+```
+
+الأمر يجمع الـTask و`AGENTS.md` وPrompt المرحلة وملفات Source of Truth الموجودة فعلياً. عند التنفيذ أو المراجعة أضف فقط الملفات المتأثرة باستخدام `--include` عدة مرات. الأداة تمنع القراءة/الكتابة خارج جذر المشروع وتطبق حد حجم افتراضياً حتى لا يتحول السياق إلى dump ضخم. التفاصيل في `docs/CONTEXT-PACKS.md`.
+
 ## مثال تطبيقي مكتمل
 
 لرؤية النظام مطبقاً على Feature حقيقية بدلاً من قوالب فارغة، راجع `examples/reference-saas-invite/`. المثال يغطي دعوة أعضاء في SaaS متعدد المستأجرين مع PRD وDomain/Data/Architecture وADR وThreat Model وTest Strategy وTask محددة وكود طبقي واختبارات للحالات السلبية مثل cross-tenant وreplay وexpiry وemail mismatch.
