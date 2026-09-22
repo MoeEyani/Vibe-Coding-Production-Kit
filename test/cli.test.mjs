@@ -53,6 +53,7 @@ test('dry-run performs no writes', async () => {
   await assert.rejects(readFile(path.join(target, 'AGENTS.md'), 'utf8'));
 });
 
+
 test('merges into existing directories when individual framework files do not conflict', async () => {
   const target = await tempDir();
   await mkdir(path.join(target, 'docs'), { recursive: true });
@@ -62,4 +63,55 @@ test('merges into existing directories when individual framework files do not co
 
   assert.equal(await readFile(path.join(target, 'docs/EXISTING.md'), 'utf8'), 'keep me\n');
   assert.match(await readFile(path.join(target, 'docs/product/PRD.md'), 'utf8'), /PRD/);
+});
+
+test('auto-detects TypeScript and fills commands proven by package scripts', async () => {
+  const target = await tempDir();
+  await writeFile(path.join(target, 'tsconfig.json'), '{}\n');
+  await writeFile(path.join(target, 'package.json'), JSON.stringify({
+    scripts: {
+      lint: 'eslint .',
+      typecheck: 'tsc --noEmit',
+      test: 'node --test',
+      build: 'tsc -p tsconfig.json'
+    }
+  }));
+  await writeFile(path.join(target, 'package-lock.json'), '{}\n');
+
+  const result = await initProject({ targetDir: target, agent: 'codex', stack: 'auto', includeGitHub: false });
+  const agents = await readFile(path.join(target, 'AGENTS.md'), 'utf8');
+
+  assert.equal(result.stack, 'typescript');
+  assert.match(agents, /LINT_COMMAND=npm run lint/);
+  assert.match(agents, /TYPECHECK_COMMAND=npm run typecheck/);
+  assert.match(agents, /## 15\. TypeScript stack profile/);
+});
+
+test('Go stack installs stable verification commands', async () => {
+  const target = await tempDir();
+  await writeFile(path.join(target, 'go.mod'), 'module example.com/demo\n\ngo 1.24\n');
+
+  const result = await initProject({ targetDir: target, agent: 'generic', stack: 'auto', includeGitHub: false });
+  const agents = await readFile(path.join(target, 'AGENTS.md'), 'utf8');
+
+  assert.equal(result.stack, 'go');
+  assert.match(agents, /LINT_COMMAND=go vet \.\/\.\.\./);
+  assert.match(agents, /BUILD_COMMAND=go build \.\/\.\.\./);
+  assert.match(agents, /## 15\. Go stack profile/);
+});
+
+test('auto-detects Python tooling only when configuration provides evidence', async () => {
+  const target = await tempDir();
+  await writeFile(path.join(target, 'pyproject.toml'), '[tool.ruff]\nline-length = 100\n\n[tool.mypy]\nstrict = true\n\n[tool.pytest.ini_options]\n');
+  await writeFile(path.join(target, 'uv.lock'), 'version = 1\n');
+
+  const result = await initProject({ targetDir: target, agent: 'generic', stack: 'auto', includeGitHub: false });
+  const agents = await readFile(path.join(target, 'AGENTS.md'), 'utf8');
+
+  assert.equal(result.stack, 'python');
+  assert.match(agents, /INSTALL_COMMAND=uv sync --frozen/);
+  assert.match(agents, /LINT_COMMAND=ruff check \./);
+  assert.match(agents, /TYPECHECK_COMMAND=mypy \./);
+  assert.match(agents, /UNIT_TEST_COMMAND=python -m pytest/);
+  assert.match(agents, /## 15\. Python stack profile/);
 });

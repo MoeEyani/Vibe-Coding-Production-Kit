@@ -20,7 +20,7 @@
     ".github/workflows/validate.yml"
   ],
   "scripts": {
-    "check": "node --check bin/vibe-coding-production.mjs && node --check lib/cli.mjs && node --check lib/init.mjs && node --check lib/adapters.mjs",
+    "check": "node --check bin/vibe-coding-production.mjs && node --check lib/cli.mjs && node --check lib/init.mjs && node --check lib/adapters.mjs && node --check lib/stacks.mjs",
     "test": "node --test",
     "test:cli": "node --test test/cli.test.mjs",
     "validate": "./scripts/validate-framework.sh && npm run check && npm test",
