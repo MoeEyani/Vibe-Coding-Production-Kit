@@ -4,6 +4,14 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-22
+
+### Added
+- Worked multi-tenant SaaS invitation reference vertical slice.
+- Completed product, domain, architecture, data, ADR, threat-model, testing, and delivery artifacts for the reference.
+- Layered dependency-free Node.js implementation with negative-path tests for authorization, tenant boundaries, token hashing, expiry, replay, and email binding.
+- Reference-project AGENTS rules and explicit production-gap documentation.
+
 ## [0.3.0] - 2026-09-22
 
 ### Added
