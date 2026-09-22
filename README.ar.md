@@ -45,6 +45,20 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 ينشئ الأمر `docs/tasks/accept-invite.md` وفيه مصادر الحقيقة، Acceptance Criteria، حدود الـscope، أسئلة الأمن والـtenant isolation، الحالات الطرفية، خطة الاختبارات، rollout/recovery، قسم تخطيط يجب تعبئته قبل تعديل الكود، checklist للمراجعة المستقلة، وأوامر التحقق الفعلية الموجودة في `AGENTS.md`. التفاصيل في `docs/TASK-PACKS.md`.
 
+## افصل بين الجاهزية للتخطيط والجاهزية للتنفيذ
+
+وجود ملف Task لا يعني أن الوقت حان لكتابة الكود. افحص المرحلتين بشكل مستقل:
+
+```bash
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production ready accept-invite --stage plan
+
+npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+  vibe-coding-production ready accept-invite --stage implement
+```
+
+مرحلة `plan` تمنع التخطيط إذا كان Outcome أو Source of Truth أو Acceptance Criteria أو حدود الـscope ناقصة. مرحلة `implement` أكثر صرامة: تشترط أيضاً حسم الحدود المعمارية والبيانات والتكاملات، الأمن والخصوصية، الحالات السلبية، Observability، خطة الاختبارات، rollout/recovery، وخطة تنفيذ فعلية. التقرير يستخدم `PASS / WARN / FAIL` مع طريقة الإصلاح ولا يخفي النواقص وراء رقم واحد. التفاصيل في `docs/TASK-READINESS.md`.
+
 ## ابنِ Context محدداً لكل مرحلة
 
 بدلاً من إرسال المستودع كاملاً إلى الـAI، اجمع أقل سياق كافٍ للمهمة والمرحلة:
