@@ -12,6 +12,24 @@ It is model-agnostic and works with tools such as Codex, Claude Code, Cursor, Gi
 
 > Arabic documentation: [README.ar.md](README.ar.md)
 
+## Bootstrap in 60 seconds
+
+Run the CLI directly from GitHub — no global install required:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
+```
+
+Or target another repository:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --yes
+```
+
+The CLI is **zero-runtime-dependency**, refuses to overwrite existing managed files unless you pass `--force`, and can add thin adapters for Claude Code and GitHub Copilot while Codex and Cursor use `AGENTS.md` directly. See [`docs/CLI.md`](docs/CLI.md).
+
+> Planned npm shorthand after the first package release: `npx vibe-coding-production init`
+
 ## Why this exists
 
 Most AI coding workflows optimize for the first demo. Real software must also survive the 100th feature, the second developer, production incidents, security reviews, migrations, refactors, and years of maintenance.
@@ -62,9 +80,13 @@ The human owns intent, trade-offs, architecture, risk acceptance, and final deci
 
 ## 5-minute start
 
-### 1. Copy the kit into your project
+### 1. Bootstrap the kit
 
-Use this repository as the governance layer for a new or existing codebase.
+Use the CLI above, or copy the repository manually if you prefer. For a preview before writing anything:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --dry-run
+```
 
 ### 2. Fill documents in this order
 
@@ -233,7 +255,7 @@ Do not duplicate conflicting rules across five agent configuration files. Prefer
 ## Roadmap
 
 - [ ] Example production project using the full workflow
-- [ ] CLI to bootstrap the kit into a repository
+- [x] CLI to bootstrap the kit into a repository
 - [ ] Stack packs for TypeScript, Python, Go, and mobile
 - [ ] CI adapters for common monorepos
 - [ ] Security checklists mapped to common application classes
