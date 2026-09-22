@@ -1,0 +1,26 @@
+name: Improvement proposal
+about: Suggest a new template, prompt, workflow, or example
+title: "[Proposal]: "
+labels: []
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Engineering problem
+      description: What recurring problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+    validations:
+      required: true
+  - type: textarea
+    id: design
+    attributes:
+      label: Proposed design
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Trade-offs / risks

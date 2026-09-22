@@ -1,0 +1,27 @@
+name: Framework problem
+about: Report incorrect, contradictory, or unusable guidance
+title: "[Bug]: "
+labels: []
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is incorrect or breaks when using the kit?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Which file/workflow/tool/stack exposed the problem?
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested improvement
