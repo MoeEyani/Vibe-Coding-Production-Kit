@@ -4,6 +4,24 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-22
+
+### Added
+- `vcp context <task>` phase-specific context pack builder for plan, implement, review, security, and release work.
+- Automatic inclusion of repository instructions, task definition, phase prompt, and existing Source of Truth references from the task pack.
+- Repeatable `--include` for narrowly scoped implementation/test context and `--output` for reusable repository-local packs.
+- Repository-root path protections and a default 120 KB context budget to prevent accidental local-file leakage or unbounded context dumps.
+- Context pack tests covering source selection, explicit includes, safe output, overwrite protection, path traversal, size budgets, and the public CLI path.
+
+## [0.5.0] - 2026-09-22
+
+### Added
+- Context-aware `vcp task <slug>` generator for bounded implementation task packs.
+- Task packs include source-of-truth references, acceptance criteria, scope, domain/security/observability/test/rollout sections, plan-before-code, independent review, and completion reporting.
+- Verification commands are imported from concrete `AGENTS.md` configuration instead of guessed from the stack.
+- Safe `--dry-run`, `--force`, `--title`, and `--dir` task controls.
+- Task generator tests for command discovery, overwrite protection, dry-run behavior, and slug validation.
+
 ## [0.4.0] - 2026-09-22
 
 ### Added
