@@ -36,6 +36,18 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-produ
 
 يعرض `PASS / WARN / FAIL` لأوامر التحقق، ملفات الـSource of Truth، القوالب التي ما زالت غير مخصصة، CI، ودورة التخطيط/المراجعة. استخدم `--json` للأتمتة و`--strict` لجعل التحذيرات تفشل في CI. التفاصيل في `docs/DOCTOR.md`.
 
+## مثال تطبيقي مكتمل
+
+لرؤية النظام مطبقاً على Feature حقيقية بدلاً من قوالب فارغة، راجع `examples/reference-saas-invite/`. المثال يغطي دعوة أعضاء في SaaS متعدد المستأجرين مع PRD وDomain/Data/Architecture وADR وThreat Model وTest Strategy وTask محددة وكود طبقي واختبارات للحالات السلبية مثل cross-tenant وreplay وexpiry وemail mismatch.
+
+```bash
+cd examples/reference-saas-invite
+npm test
+npm run check
+```
+
+المثال يذكر صراحة ما لم يثبته بعد على مستوى قاعدة البيانات والـHTTP والمصادقة والبنية التشغيلية، بدلاً من وصف Demo على أنه Production-ready.
+
 ## المسار الكامل
 
 ```text
