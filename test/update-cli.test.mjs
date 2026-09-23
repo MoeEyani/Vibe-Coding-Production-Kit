@@ -43,7 +43,9 @@ test('CLI update check works offline without registry access', async () => {
   const report = JSON.parse(stdout);
   assert.equal(report.installedVersion, '0.9.0');
   assert.equal(report.cliVersion, '0.9.0');
-  assert.equal(report.latestVersion, '0.9.0');
+  assert.equal(report.registryChecked, false);
+  assert.equal(report.latestVersion, null);
+  assert.equal(report.recommendedVersion, '0.9.0');
   assert.equal(report.updateAvailable, false);
 });
 
