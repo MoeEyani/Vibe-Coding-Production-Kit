@@ -34,6 +34,12 @@ test('three-way merge reports overlapping edits as conflicts', () => {
   assert.equal(result.clean, false);
 });
 
+test('three-way merge handles an empty baseline without crashing', () => {
+  const result = threeWayMerge('', 'local\n', 'upstream\n');
+  assert.equal(result.clean, false);
+  assert.match(result.reason, /Overlapping edits/);
+});
+
 test('planner refuses implicit managed-file removal without migration metadata', async () => {
   const target = await mkdtemp(path.join(os.tmpdir(), 'vcp-update-safety-'));
   const relative = 'docs/legacy.md';
