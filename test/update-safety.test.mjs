@@ -57,6 +57,23 @@ test('three-way merge handles an empty baseline without crashing', () => {
   assert.match(result.reason, /Overlapping edits/);
 });
 
+test('three-way merge refuses unbounded quadratic work', () => {
+  const baseLines = Array.from({ length: 2100 }, (_, index) => `line-${index}`);
+  const base = `${baseLines.join('\n')}\n`;
+  const localLines = [...baseLines];
+  const upstreamLines = [...baseLines];
+  localLines[0] = 'local-change';
+  upstreamLines[upstreamLines.length - 1] = 'upstream-change';
+
+  const result = threeWayMerge(
+    base,
+    `${localLines.join('\n')}\n`,
+    `${upstreamLines.join('\n')}\n`
+  );
+  assert.equal(result.clean, false);
+  assert.match(result.reason, /too large/i);
+});
+
 test('planner refuses implicit managed-file removal without migration metadata', async () => {
   const target = await mkdtemp(path.join(os.tmpdir(), 'vcp-update-safety-'));
   const relative = 'docs/legacy.md';
