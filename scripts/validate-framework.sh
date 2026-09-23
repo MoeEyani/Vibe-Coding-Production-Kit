@@ -16,6 +16,7 @@ required_files=(
   "docs/VERIFICATION-EVIDENCE.md"
   "docs/QUICKSTART.md"
   "docs/CONTEXT-PACKS.md"
+  "docs/UPDATES.md"
   "docs/product/PRODUCT-BRIEF.md"
   "docs/product/PRD.md"
   "docs/product/USER-FLOWS.md"
@@ -46,14 +47,12 @@ for file in "${required_files[@]}"; do
   fi
 done
 
-# Guard against accidental committed secrets commonly copied into examples.
 if grep -RInE --exclude-dir=.git --exclude='validate-framework.sh' \
   '(BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY|aws_secret_access_key[[:space:]]*=|ghp_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{30,})' .; then
   echo "ERROR: possible secret material detected." >&2
   failed=1
 fi
 
-# Ensure executable shell files parse.
 while IFS= read -r -d '' script; do
   bash -n "$script"
 done < <(find scripts -type f -name '*.sh' -print0)
