@@ -64,6 +64,36 @@ test('doctor fails when an existing VCP manifest is corrupted', async () => {
   assert.ok(report.summary.fail > 0);
 });
 
+test('doctor fails when update transaction state is corrupted', async () => {
+  const root = await tempDir();
+  await initProject({ targetDir: root, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await writeFile(path.join(root, '.vcp/transaction.json'), '{ broken transaction\n', 'utf8');
+
+  const report = await runDoctor(root);
+  const transaction = report.checks.find((item) => item.id === 'update-transaction');
+  assert.equal(transaction.status, 'fail');
+  assert.match(transaction.detail, /Cannot read update transaction/);
+});
+
+test('doctor fails when an interrupted update transaction is present', async () => {
+  const root = await tempDir();
+  await initProject({ targetDir: root, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await writeFile(path.join(root, '.vcp/transaction.json'), `${JSON.stringify({
+    schemaVersion: 1,
+    id: 'interrupted-1',
+    backupId: 'backup-1',
+    fromVersion: '0.8.0',
+    toVersion: '0.9.0',
+    phase: 'applying',
+    startedAt: '2026-09-23T00:00:00.000Z'
+  }, null, 2)}\n`, 'utf8');
+
+  const report = await runDoctor(root);
+  const transaction = report.checks.find((item) => item.id === 'update-transaction');
+  assert.equal(transaction.status, 'fail');
+  assert.match(transaction.detail, /Incomplete VCP update transaction/);
+});
+
 test('0.8 manifest migrates transactionally to 0.9 and can roll back', async () => {
   const root = await tempDir();
   await initProject({ targetDir: root, agent: 'generic', stack: 'generic', includeGitHub: false });
