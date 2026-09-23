@@ -7,6 +7,7 @@ import { threeWayMerge } from '../lib/merge.mjs';
 import { compareVersions, resolveMigrationPath } from '../lib/migrations.mjs';
 import { hashContent } from '../lib/state.mjs';
 import { planUpdate, publicUpdateReport } from '../lib/update.mjs';
+import { composeMigrationMetadata } from '../lib/update-plan.mjs';
 
 test('semantic versions compare deterministically', () => {
   assert.equal(compareVersions('0.8.0', '0.9.0'), -1);
@@ -17,6 +18,22 @@ test('semantic versions compare deterministically', () => {
 test('migration resolver finds the supported 0.8 -> 0.9 path', () => {
   const result = resolveMigrationPath('0.8.0', '0.9.0');
   assert.deepEqual(result.map((item) => item.id), ['0.8.0-to-0.9.0-foundation']);
+});
+
+test('migration metadata composes chained renames and removals', () => {
+  const metadata = composeMigrationMetadata([
+    { renames: [{ from: 'docs/a.md', to: 'docs/b.md' }], removals: [] },
+    { renames: [{ from: 'docs/b.md', to: 'docs/c.md' }], removals: [] }
+  ]);
+  assert.deepEqual([...metadata.renames.entries()], [['docs/a.md', 'docs/c.md']]);
+  assert.deepEqual([...metadata.removals], []);
+
+  const removed = composeMigrationMetadata([
+    { renames: [{ from: 'docs/a.md', to: 'docs/b.md' }], removals: [] },
+    { renames: [], removals: ['docs/b.md'] }
+  ]);
+  assert.deepEqual([...removed.renames.entries()], []);
+  assert.deepEqual([...removed.removals], ['docs/a.md']);
 });
 
 test('three-way merge preserves independent local and upstream edits', () => {
