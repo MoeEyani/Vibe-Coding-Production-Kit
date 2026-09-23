@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import { threeWayMerge } from '../lib/merge.mjs';
 import { compareVersions, resolveMigrationPath } from '../lib/migrations.mjs';
-import { publicUpdateReport } from '../lib/update.mjs';
+import { hashContent } from '../lib/state.mjs';
+import { planUpdate, publicUpdateReport } from '../lib/update.mjs';
 
 test('semantic versions compare deterministically', () => {
   assert.equal(compareVersions('0.8.0', '0.9.0'), -1);
@@ -28,6 +32,47 @@ test('three-way merge preserves independent local and upstream edits', () => {
 test('three-way merge reports overlapping edits as conflicts', () => {
   const result = threeWayMerge('one\ntwo\n', 'one local\ntwo\n', 'one upstream\ntwo\n');
   assert.equal(result.clean, false);
+});
+
+test('planner refuses implicit managed-file removal without migration metadata', async () => {
+  const target = await mkdtemp(path.join(os.tmpdir(), 'vcp-update-safety-'));
+  const relative = 'docs/legacy.md';
+  const baseline = 'tracked by vcp\n';
+  await mkdir(path.join(target, '.vcp/baselines/docs'), { recursive: true });
+  await mkdir(path.join(target, 'docs'), { recursive: true });
+  await writeFile(path.join(target, relative), baseline, 'utf8');
+  await writeFile(path.join(target, '.vcp/baselines/docs/legacy.md'), baseline, 'utf8');
+  await writeFile(path.join(target, '.vcp/manifest.json'), `${JSON.stringify({
+    schemaVersion: 1,
+    installedVersion: '0.9.0',
+    installedAt: '2026-09-23T00:00:00.000Z',
+    updatedAt: '2026-09-23T00:00:00.000Z',
+    install: { agent: 'generic', stack: 'generic', includeGitHub: false },
+    ignoredFiles: [],
+    managedFiles: {
+      [relative]: {
+        policy: 'managed',
+        origin: 'template',
+        mode: 420,
+        baselineHash: hashContent(baseline),
+        baselinePath: '.vcp/baselines/docs/legacy.md',
+        templateVersion: '0.9.0'
+      }
+    }
+  }, null, 2)}\n`, 'utf8');
+
+  const plan = await planUpdate({
+    targetDir: target,
+    targetVersion: '0.9.0',
+    currentVersion: '0.9.0',
+    migrations: [],
+    desiredBuilder: async () => ({ files: new Map(), stack: 'generic' })
+  });
+
+  assert.equal(plan.conflicts, 1);
+  assert.equal(plan.changes, 0);
+  assert.equal(plan.actions[0].type, 'CONFLICT');
+  assert.match(plan.actions[0].reason, /explicit migration removal/i);
 });
 
 test('public update JSON never exposes desired or file content', () => {
