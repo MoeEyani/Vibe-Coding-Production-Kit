@@ -4,12 +4,21 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { initProject } from '../lib/init.mjs';
+import { runDoctor } from '../lib/doctor.mjs';
 import { ignorePath, trackPath } from '../lib/manage.mjs';
 import { applyUpdate, planUpdate, rollbackProject } from '../lib/update.mjs';
 
-async function tempDir() { return mkdtemp(path.join(os.tmpdir(), 'vcp-update-')); }
-async function manifest(root) { return JSON.parse(await readFile(path.join(root, '.vcp/manifest.json'), 'utf8')); }
-async function writeManifest(root, value) { await writeFile(path.join(root, '.vcp/manifest.json'), `${JSON.stringify(value, null, 2)}\n`); }
+async function tempDir() {
+  return mkdtemp(path.join(os.tmpdir(), 'vcp-update-'));
+}
+
+async function manifest(root) {
+  return JSON.parse(await readFile(path.join(root, '.vcp/manifest.json'), 'utf8'));
+}
+
+async function writeManifest(root, value) {
+  await writeFile(path.join(root, '.vcp/manifest.json'), `${JSON.stringify(value, null, 2)}\n`);
+}
 
 test('fresh v0.9 install is update-idempotent', async () => {
   const root = await tempDir();
@@ -42,6 +51,17 @@ test('manage ignore and track change ownership without deleting local content', 
   await trackPath({ targetDir: root, relativePath: 'AGENTS.md' });
   assert.equal((await manifest(root)).ignoredFiles.includes('AGENTS.md'), false);
   assert.equal(await readFile(agents, 'utf8'), before);
+});
+
+test('doctor fails when an existing VCP manifest is corrupted', async () => {
+  const root = await tempDir();
+  await initProject({ targetDir: root, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await writeFile(path.join(root, '.vcp/manifest.json'), '{ definitely not json\n', 'utf8');
+
+  const report = await runDoctor(root);
+  const updateState = report.checks.find((item) => item.id === 'update-state');
+  assert.equal(updateState.status, 'fail');
+  assert.ok(report.summary.fail > 0);
 });
 
 test('0.8 manifest migrates transactionally to 0.9 and can roll back', async () => {
