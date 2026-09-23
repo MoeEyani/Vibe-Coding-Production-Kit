@@ -44,7 +44,9 @@ Machine-readable form:
 vcp update . --check --json
 ```
 
-A newer npm version is not applied by an older CLI. VCP prints a version-pinned `npx` command so the target templates and migration code come from the version being installed.
+With `--offline`, VCP does not claim to know the npm registry's latest version. It compares the project only with the running CLI and reports `registryChecked: false` in JSON.
+
+A newer npm version is not applied by an older CLI. VCP prints a version-pinned `npx` command so the target templates and migration code come from the version being installed. If the running CLI is already newer than the registry version, VCP never recommends downgrading to the registry copy.
 
 ## Preview before writing
 
@@ -104,7 +106,7 @@ Or a specific backup:
 vcp rollback . --backup <id>
 ```
 
-Rollback restores files, the manifest, and baseline snapshots. It also clears interrupted transaction/lock state.
+Rollback restores files, the manifest, and baseline snapshots. It also clears interrupted transaction/lock state. Rollback itself acquires the update lock so it cannot race a live updater.
 
 ## Three-way merge
 
@@ -116,23 +118,31 @@ For mergeable files VCP compares:
 
 Independent edits can merge automatically. Overlapping edits are reported as `CONFLICT`; VCP does not choose a winner or silently overwrite project changes.
 
+Automatic merge work is bounded. Files large enough to make the line-based LCS merge unreasonably expensive are reported as `CONFLICT` for manual resolution rather than allowing unbounded memory use.
+
 ## Deleted and renamed files
 
-Version migrations explicitly declare renames/removals. An unmodified managed file removed upstream can be deleted safely. A locally modified or `preserve` file is detached instead of deleted.
+Version migrations explicitly declare renames/removals. A managed file disappearing from a target package without an explicit migration removal is treated as `CONFLICT`, not as permission to delete it.
 
-A rename refuses to overwrite an unrelated destination and treats overlapping local/upstream edits as a conflict.
+When a removal is explicitly declared, an unmodified managed file can be deleted safely. A locally modified or `preserve` file is detached instead of deleted.
+
+A rename refuses to overwrite an unrelated destination and treats overlapping local/upstream edits as a conflict. Rename chains across multiple migrations are composed so a project can move across more than one historical version without requiring intermediate files to exist in the original manifest.
 
 ## Recovery and Doctor
 
 `vcp doctor` checks lifecycle state in addition to the normal engineering-system checks. It can surface:
 
-- missing/corrupt manifests;
+- missing manifests for legacy/uninitialized projects;
+- corrupt manifests as failures;
 - unsupported manifest schema versions;
 - baseline integrity problems;
-- interrupted update transactions.
+- interrupted update transactions;
+- corrupt transaction state.
 
 If a previous update was interrupted, inspect the repository and use `vcp rollback` before starting another update.
 
 ## Safety boundaries
 
-Update paths are repository-relative and validated against traversal and symlink escapes. VCP state paths under `.vcp` receive the same no-symlink treatment. A lock prevents two update processes from mutating the same project concurrently; stale locks are only reclaimed after the owning process is gone and the lock is old enough.
+Update paths are repository-relative and validated against traversal and symlink escapes. VCP state paths under `.vcp` receive the same no-symlink treatment.
+
+A lock prevents update and rollback processes from mutating the same project concurrently. A lock owned by a dead process on the same host can be reclaimed immediately for recovery. A lock from another host, or malformed lock metadata, is only reclaimed after the configured stale interval so VCP does not guess that a remote writer has disappeared.
