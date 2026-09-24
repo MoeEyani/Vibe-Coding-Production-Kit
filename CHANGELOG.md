@@ -10,6 +10,7 @@ All notable changes to this project will be documented here.
 - Task-readiness detection for duplicated level-two sections that would make Markdown parsing ambiguous.
 - Readiness warnings when referenced Source of Truth files still contain known starter-template signals.
 - AI-first repository workflow guidance in `AGENTS.md`, Quickstart, CLI docs, and English/Arabic README files: agents inspect/draft/run VCP while developers make human-intent decisions.
+- Explicit lifecycle migration from `0.9.0` to `0.9.1`, preserving the ordered migration chain from older `0.8.0` projects.
 
 ### Changed
 - `ready --stage implement` now requires an executable task verification plan so a task cannot report implementation-ready when `vcp verify` cannot build commands.
@@ -17,7 +18,7 @@ All notable changes to this project will be documented here.
 - Documentation now treats Source of Truth templates as agent-drafted engineering artifacts rather than manual form-filling requirements for developers.
 
 ### Fixed
-- Reasoned non-applicable verification values such as `n/a — no E2E surface` and `n/a - no build step` are no longer copied into task packs as executable shell commands.
+- Reasoned non-applicable verification values such as `n/a — no E2E surface` and `n/a - no build step` are no longer copied into task packs or parsed from existing task packs as executable shell commands.
 - GitHub repository references now use the current `Moeeryani` username in package metadata and updated documentation.
 - The dogfood gap where `ready --stage implement` could pass but `vcp verify` immediately failed with no concrete commands is covered by regression tests.
 
