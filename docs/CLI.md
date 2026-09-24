@@ -1,6 +1,6 @@
 # CLI
 
-The CLI bootstraps the Vibe Coding Production Kit into a new or existing repository without replacing unrelated files.
+The CLI bootstraps the Vibe Coding Production Kit into a new or existing repository, manages its lifecycle state, and provides task/readiness/context/verification workflows without replacing unrelated files.
 
 ## Run directly from GitHub
 
@@ -18,11 +18,97 @@ npx vibe-coding-production init
 
 The installed executable is also available as `vcp`.
 
-To audit an existing repository without writing files:
+## Initialize once, then update
+
+Initialization creates the framework plus `.vcp/manifest.json` and baseline snapshots used by the safe update engine.
+
+```bash
+vcp init . --agent all --stack auto --yes
+```
+
+Once a project has `.vcp/manifest.json`, `init` refuses to replace that lifecycle state even with `--force`. Use `vcp update` instead.
+
+Preview initialization before writing:
+
+```bash
+vcp init . --agent all --dry-run
+```
+
+## Safe lifecycle updates
+
+Check whether the project or running CLI is behind:
+
+```bash
+vcp update . --check
+vcp update . --check --json
+```
+
+Use `--offline` to avoid registry access and compare only with the running CLI:
+
+```bash
+vcp update . --check --offline
+```
+
+Preview the exact migration plan without changing files:
+
+```bash
+vcp update . --dry-run
+vcp update . --dry-run --json
+```
+
+Apply an update only after reviewing the plan:
+
+```bash
+vcp update .
+```
+
+The updater uses persistent baselines, ownership policies, explicit migrations, bounded three-way merge, conflict blocking, path/symlink validation, a lifecycle lock, transaction state, backups, post-apply verification, and automatic rollback after apply failures.
+
+A newer npm version is never applied by an older CLI. `--check` returns a version-pinned `npx` command targeting the same project path so the migration code and templates come from the version being installed.
+
+See [`UPDATES.md`](UPDATES.md) for the full lifecycle contract.
+
+## Roll back the newest recovery point
+
+```bash
+vcp rollback .
+```
+
+You may name the newest backup explicitly:
+
+```bash
+vcp rollback . --backup <id>
+```
+
+VCP v0.9 intentionally refuses arbitrary historical rollback because an older partial backup cannot safely prove that files introduced by later updates are restored consistently. Older backups remain available for inspection.
+
+If an interrupted transaction exists, rollback requires the backup tied to that transaction.
+
+## Ignore or re-track a managed file
+
+Detach a path from VCP management without deleting its local content:
+
+```bash
+vcp manage ignore AGENTS.md
+```
+
+Re-track a path that belongs to the current VCP package:
+
+```bash
+vcp manage track AGENTS.md
+```
+
+`manage` mutations share the same lifecycle lock as updates and rollback, so they cannot race a live updater. Tracking an already managed path is a no-op rather than redefining its baseline.
+
+## Audit an existing repository
+
+`doctor` is read-only:
 
 ```bash
 vcp doctor .
 ```
+
+In addition to engineering-system checks, v0.9 validates lifecycle state, manifest compatibility, baseline integrity, and interrupted/corrupt update transactions.
 
 See [`DOCTOR.md`](DOCTOR.md) for JSON output and strict CI behavior.
 
@@ -87,36 +173,67 @@ npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
 
 `context` combines the task, `AGENTS.md`, the phase-specific operating prompt, and existing files referenced in the task's Source of Truth. Add current implementation files explicitly with repeatable `--include` flags. Print to stdout or use `--output` to save a pack inside the repository. See [`CONTEXT-PACKS.md`](CONTEXT-PACKS.md).
 
+## Turn verification into evidence
+
+Preview configured verification commands without executing them:
+
+```bash
+vcp verify accept-invite
+```
+
+Execution requires explicit consent and implementation readiness:
+
+```bash
+vcp verify accept-invite --run --output .vcp/evidence/accept-invite.json
+```
+
+See [`VERIFICATION-EVIDENCE.md`](VERIFICATION-EVIDENCE.md).
+
 ## Safety behavior
 
 The CLI is intentionally conservative:
 
-- it merges into existing directories instead of deleting them;
-- it refuses to overwrite any framework-managed file by default;
-- `--dry-run` previews every file that would be written;
-- `--force` is required to replace an existing managed file;
-- `--no-github` skips GitHub-specific templates and workflow files.
+- it merges into existing directories instead of deleting unrelated files;
+- initial bootstrap refuses framework-file overwrite unless `--force` is explicit;
+- initialized VCP projects cannot be re-initialized over existing lifecycle state;
+- `update --dry-run` computes the full plan without writing project files;
+- any update conflict blocks apply before project-file writes;
+- removals must be explicitly declared by migrations;
+- customized `preserve` documents are not overwritten;
+- update/rollback/manage mutations share one lifecycle lock;
+- update reports omit project/template file contents from public JSON;
+- repository and `.vcp` paths reject traversal and symlink escapes;
+- `--no-github` skips GitHub-specific templates and workflow files during initialization.
 
-Before using `--force`, inspect the reported conflicts. The CLI never treats an overwrite as implicit approval.
+Before using bootstrap `--force`, inspect the reported conflicts. The CLI never treats an overwrite as implicit approval.
 
-## Options
+## Common options
 
 ```text
---agent <name>    generic | codex | cursor | claude | copilot | all
---stack <name>    auto | generic | typescript | python | go
---yes, -y         non-interactive mode
---force           overwrite framework-managed files
---no-github       skip GitHub issue/PR/workflow files
---dry-run         preview without writing
---title <text>    task title
---stage <name>    readiness stage: plan | implement
---dir <path>      task/context target repository (default: current directory)
---mode <name>     context mode: plan | implement | review | security | release
---include <path>  add an explicit context file; repeatable
---output <path>   write context pack inside the repository instead of stdout
---max-bytes <n>   maximum context pack bytes; 0 disables the limit
---help, -h        show help
---version, -v     show version
+--agent <name>     generic | codex | cursor | claude | copilot | all
+--stack <name>     auto | generic | typescript | python | go
+--yes, -y          non-interactive initialization
+--force            explicit overwrite where that command supports it
+--no-github        skip GitHub issue/PR/workflow files during init
+--dry-run          preview without writing; update computes the full plan
+--check            update: check project/CLI/npm version state
+--offline          update --check/apply: do not query npm
+--to <version>     update: require the target bundled in the running CLI
+--backup <id>      rollback: name the newest/transaction recovery point
+--json             machine-readable output where supported
+--strict           doctor/ready: make warnings non-zero
+--run              verify: explicitly execute repository-controlled commands
+--only <key>       verify: select one configured verification command; repeatable
+--timeout-ms <n>   verify: per-command timeout
+--title <text>     task title
+--stage <name>     readiness stage: plan | implement
+--dir <path>       task/ready/context/manage target repository
+--mode <name>      context mode: plan | implement | review | security | release
+--include <path>   add an explicit context file; repeatable
+--output <path>    write context/evidence inside the repository
+--max-bytes <n>    maximum context pack bytes; 0 disables the limit
+--help, -h         show help
+--version, -v      show version
 ```
 
 ## Requirements
