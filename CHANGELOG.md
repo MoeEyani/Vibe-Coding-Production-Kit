@@ -4,9 +4,41 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-24
+
 ### Added
+- Repository-native lifecycle state via `.vcp/manifest.json` plus persistent baseline snapshots.
+- Safe `vcp update --check`, `vcp update --dry-run`, and transactional update application.
+- Version-pinned delegated update commands when a newer npm CLI is required.
+- Explicit ownership policies for `managed`, `generated`, and `preserve` files.
+- Bounded three-way merge for independent local/upstream changes with conflict blocking for overlapping edits.
+- Versioned migration registry with explicit rename/removal declarations and multi-step migration composition.
+- Transaction backups, lifecycle locking, interrupted-update state, post-apply verification, and automatic rollback on apply failures.
+- Conservative `vcp rollback` recovery limited to the newest safe recovery point or the backup tied to an interrupted transaction.
+- `vcp manage ignore|track` for detaching/re-attaching managed files without deleting local content.
+- Lifecycle-aware `doctor` checks for manifest compatibility, baseline integrity, and interrupted/corrupt transactions.
+- Path traversal and symlink protections for both managed repository paths and `.vcp` internal state.
+- SemVer-aware update comparison including prerelease precedence and build-metadata handling.
 - End-to-end `docs/QUICKSTART.md` covering bootstrap, task creation, readiness, bounded context, verification evidence, review, and repository audit.
-- Ready-to-paste v0.8.0 release notes and GitHub generated-release-notes category configuration.
+- `docs/UPDATES.md` documenting the update/ownership/merge/rollback contract.
+- Ready-to-paste release-note infrastructure and GitHub generated-release-notes configuration.
+- Regression coverage for update planning, conflicts, explicit removals, migrations, locking, concurrency, rollback guards, SemVer, CLI flows, init lifecycle guards, and manage-state transitions.
+
+### Changed
+- `vcp init` now creates versioned VCP lifecycle state and refuses to replace an already initialized VCP project even with `--force`; lifecycle changes use `vcp update` instead.
+- Update planning now occurs only after acquiring the lifecycle lock, preventing stale concurrent plans.
+- `manage` mutations share the update/rollback lifecycle lock and tracking an already managed path is a no-op.
+- `npm run check` syntax-checks every `lib/*.mjs` module.
+- Framework validation includes the lifecycle update guide while remaining valid inside projects bootstrapped by the CLI.
+
+### Fixed
+- Managed files that disappear from a target package without an explicit migration removal now become `CONFLICT` instead of being silently detached/deleted.
+- Three-way merge preserves final-newline changes instead of resolving them with a blanket boolean OR.
+- `update --check` delegates to the actual project path that was checked instead of always suggesting `.`.
+- Dead same-host locks can be reclaimed while fresh foreign-host locks remain protected by the stale interval.
+- Backup IDs and newest-backup selection are safe when recovery points are created very close together.
+- Historical partial backups can no longer be restored as if they represented a complete arbitrary-version rollback.
+- `ignore` commits manifest detachment before baseline cleanup, preventing a failed cleanup from leaving the manifest pointing at a removed baseline.
 
 ## [0.8.0] - 2026-09-22
 
@@ -89,6 +121,6 @@ All notable changes to this project will be documented here.
 - Initial Vibe Engineering operating model.
 - Product, architecture, data, security, testing, and delivery templates.
 - Repository-wide `AGENTS.md`.
-- Agent prompts for discovery, planning, implementation, review, security, refactoring, and release readiness.
+- Agent prompts for discovery, planning, implementation, review, security, refactoring, release readiness.
 - GitHub contribution and CI scaffolding.
 - English and Arabic README files.
