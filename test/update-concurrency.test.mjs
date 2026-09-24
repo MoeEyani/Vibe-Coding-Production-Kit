@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { ignorePath } from '../lib/manage.mjs';
 import { acquireUpdateLock, releaseUpdateLock } from '../lib/state.mjs';
 import { applyUpdate } from '../lib/update.mjs';
 
@@ -68,4 +69,17 @@ test('a second updater cannot plan against stale state while the first updater h
 
   await acquireUpdateLock(root);
   await releaseUpdateLock(root);
+});
+
+test('manage mutations are rejected while an updater holds the lifecycle lock', async () => {
+  const root = await tempProject();
+  await acquireUpdateLock(root);
+  try {
+    await assert.rejects(
+      ignorePath({ targetDir: root, relativePath: 'AGENTS.md' }),
+      /Another VCP update appears to be running/
+    );
+  } finally {
+    await releaseUpdateLock(root);
+  }
 });
