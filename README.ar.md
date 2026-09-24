@@ -10,31 +10,29 @@
 
 ## تشغيل خلال دقيقة
 
-قبل أول نشر رسمي على npm، شغّل الـCLI مباشرة من GitHub:
+الحزمة الرسمية منشورة على npm، وهذا هو المسار الأساسي:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
-  init . --agent all --stack auto --yes
+npx vibe-coding-production init . --agent all --stack auto --yes
 ```
 
 أو لمشروع آخر:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
-  init ./my-app --agent claude --stack auto --yes
+npx vibe-coding-production init ./my-app --agent claude --stack auto --yes
 ```
 
 للمعاينة بدون كتابة أي ملف:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
-  init . --agent all --stack auto --dry-run
+npx vibe-coding-production init . --agent all --stack auto --dry-run
 ```
 
-بعد أول نشر على npm سيصبح الاختصار:
+إذا أردت تشغيل المصدر الحالي من GitHub بدلاً من الحزمة المنشورة:
 
 ```bash
-npx vibe-coding-production init . --agent all --stack auto --yes
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
+  init . --agent all --stack auto --yes
 ```
 
 المتطلبات: **Node.js 22+**. الـCLI لا يملك runtime dependencies خارجية.
