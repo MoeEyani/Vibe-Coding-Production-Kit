@@ -9,16 +9,22 @@ The goal is not to generate a whole application in one prompt. The goal is to es
 From an existing repository:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
+npx vibe-coding-production init . --agent all --stack auto --yes
 ```
 
 Preview first if you want to see every managed path before writing:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes --dry-run
+npx vibe-coding-production init . --agent all --stack auto --yes --dry-run
 ```
 
-The initializer does not overwrite framework-managed files unless `--force` is explicitly supplied.
+The initializer does not overwrite framework-managed files unless `--force` is explicitly supplied. Once lifecycle state exists in `.vcp/manifest.json`, use `vcp update` rather than re-running initialization with `--force`.
+
+If you specifically want to run the current GitHub source instead of the published npm package, use:
+
+```bash
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
+```
 
 ## 2. Establish the source of truth
 
@@ -38,8 +44,7 @@ Also make sure `AGENTS.md` contains the repository's real verification commands.
 ## 3. Create one bounded task
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production task accept-invite \
+npx vibe-coding-production task accept-invite \
   --title "Accept organization invitation"
 ```
 
@@ -56,8 +61,7 @@ Fill its outcome, Source of Truth, acceptance criteria, scope, security decision
 Before asking an AI agent to plan:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production ready accept-invite --stage plan
+npx vibe-coding-production ready accept-invite --stage plan
 ```
 
 Do not continue while blocking findings remain.
@@ -65,8 +69,7 @@ Do not continue while blocking findings remain.
 ## 5. Build the planning context
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production context accept-invite --mode plan
+npx vibe-coding-production context accept-invite --mode plan
 ```
 
 The context pack includes repository rules, the task, the planning prompt, and existing Source of Truth references from the task. It does not dump the whole repository.
@@ -78,8 +81,7 @@ Review and approve the plan before implementation.
 After the plan is explicit:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production ready accept-invite --stage implement
+npx vibe-coding-production ready accept-invite --stage implement
 ```
 
 The implementation gate is intentionally stricter than the planning gate.
@@ -89,8 +91,7 @@ The implementation gate is intentionally stricter than the planning gate.
 Add only the files the approved plan needs:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production context accept-invite \
+npx vibe-coding-production context accept-invite \
   --mode implement \
   --include src/invitations/service.ts \
   --include test/invitations/service.test.ts
@@ -103,8 +104,7 @@ Use the output with your coding agent. Keep implementation bounded to the task c
 Before executing repository-controlled commands:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production verify accept-invite
+npx vibe-coding-production verify accept-invite
 ```
 
 Preview is safe by default and does not run the commands.
@@ -114,8 +114,7 @@ Preview is safe by default and does not run the commands.
 After reviewing the command list:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production verify accept-invite \
+npx vibe-coding-production verify accept-invite \
   --run \
   --output .vcp/evidence/accept-invite.json
 ```
@@ -125,8 +124,7 @@ Verification runs sequentially, stops after the first failure, and records mecha
 ## 10. Build independent review context
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production context accept-invite \
+npx vibe-coding-production context accept-invite \
   --mode review \
   --include src/invitations/service.ts \
   --include test/invitations/service.test.ts
@@ -137,8 +135,7 @@ Prefer a fresh agent/context for review rather than relying only on the agent th
 ## 11. Audit the repository before merge/release
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production doctor .
+npx vibe-coding-production doctor .
 ```
 
 Use `--strict` when warnings should block your team or CI policy.
