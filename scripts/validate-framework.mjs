@@ -58,6 +58,14 @@ async function existsNonEmpty(relative) {
   }
 }
 
+async function directoryExists(relative) {
+  try {
+    return (await stat(path.join(root, relative))).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 async function* walk(current = root) {
   for (const entry of await readdir(current, { withFileTypes: true })) {
     if (entry.isDirectory() && excludedDirs.has(entry.name)) continue;
@@ -92,14 +100,18 @@ async function scanForSecrets() {
   return findings;
 }
 
-async function validateShellLineEndings() {
+async function validateExecutableLineEndings() {
   const findings = [];
-  const scriptsDir = path.join(root, 'scripts');
-  for (const entry of await readdir(scriptsDir, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith('.sh')) continue;
-    const absolute = path.join(scriptsDir, entry.name);
-    const buffer = await readFile(absolute);
-    if (buffer.includes(13)) findings.push(`scripts/${entry.name}`);
+  for (const relativeDir of ['bin', 'scripts']) {
+    if (!(await directoryExists(relativeDir))) continue;
+    const dir = path.join(root, relativeDir);
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      const relative = `${relativeDir}/${entry.name}`;
+      const buffer = await readFile(path.join(dir, entry.name));
+      const firstLine = buffer.toString('utf8', 0, Math.min(buffer.length, 256)).split('\n', 1)[0];
+      if (firstLine.startsWith('#!') && buffer.includes(13)) findings.push(relative);
+    }
   }
   return findings;
 }
@@ -118,10 +130,10 @@ if (secretFindings.length > 0) {
   failed = true;
 }
 
-const crlfShellFiles = await validateShellLineEndings();
-if (crlfShellFiles.length > 0) {
-  for (const relative of crlfShellFiles) console.error(`ERROR: shell script contains CR/CRLF line endings: ${relative}`);
-  console.error('Re-check out the repository with .gitattributes applied before packing or publishing.');
+const crlfExecutables = await validateExecutableLineEndings();
+if (crlfExecutables.length > 0) {
+  for (const relative of crlfExecutables) console.error(`ERROR: executable with shebang contains CR/CRLF line endings: ${relative}`);
+  console.error('Use a fresh checkout with .gitattributes applied before packing or publishing.');
   failed = true;
 }
 
