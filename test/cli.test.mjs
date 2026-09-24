@@ -185,7 +185,7 @@ test('task generator creates a bounded task and imports configured verification 
   });
   const task = await readFile(path.join(target, result.relative), 'utf8');
 
-  assert.equal(result.relative, path.join('docs', 'tasks', 'accept-invite.md'));
+  assert.equal(result.relative, 'docs/tasks/accept-invite.md');
   assert.match(task, /# Task — Accept invitation/);
   assert.match(task, /`LINT_COMMAND`: `npm run lint`/);
   assert.match(task, /`TYPECHECK_COMMAND`: `npm run typecheck`/);
