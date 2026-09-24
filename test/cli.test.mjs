@@ -23,7 +23,10 @@ test('installs the core framework and GitHub assets', async () => {
   assert.match(await readFile(path.join(target, 'AGENTS.md'), 'utf8'), /# AGENTS\.md/);
   assert.match(await readFile(path.join(target, 'docs/product/PRD.md'), 'utf8'), /PRD/);
   assert.match(await readFile(path.join(target, '.github/workflows/validate.yml'), 'utf8'), /Framework Validation/);
-  const { stdout } = await execFileAsync(path.join(target, 'scripts/validate-framework.sh'), { cwd: target });
+
+  const installedShell = await readFile(path.join(target, 'scripts/validate-framework.sh'), 'utf8');
+  assert.equal(installedShell.includes('\r'), false);
+  const { stdout } = await execFileAsync(process.execPath, [path.join(target, 'scripts/validate-framework.mjs')], { cwd: target });
   assert.match(stdout, /Framework validation passed/);
 });
 
@@ -54,7 +57,6 @@ test('dry-run performs no writes', async () => {
   assert.equal(result.dryRun, true);
   await assert.rejects(readFile(path.join(target, 'AGENTS.md'), 'utf8'));
 });
-
 
 test('merges into existing directories when individual framework files do not conflict', async () => {
   const target = await tempDir();
@@ -118,7 +120,6 @@ test('auto-detects Python tooling only when configuration provides evidence', as
   assert.match(agents, /## 15\. Python stack profile/);
 });
 
-
 test('doctor fails when the framework is not installed', async () => {
   const target = await tempDir();
   const report = await runDoctor(target);
@@ -162,7 +163,6 @@ test('doctor reports explicit stack commands as resolved', async () => {
   assert.equal(report.stack, 'typescript');
   assert.equal(commands.status, 'pass');
 });
-
 
 test('task generator creates a bounded task and imports configured verification commands', async () => {
   const target = await tempDir();
