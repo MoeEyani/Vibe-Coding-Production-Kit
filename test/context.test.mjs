@@ -25,8 +25,8 @@ test('context pack bundles task, repository rules, mode prompt, and source-of-tr
   assert.equal(result.mode, 'plan');
   assert.ok(result.files.includes('AGENTS.md'));
   assert.ok(result.files.includes('prompts/02-plan-task.md'));
-  assert.ok(result.files.includes(path.join('docs', 'tasks', 'accept-invite.md')));
-  assert.ok(result.files.includes(path.join('docs', 'product', 'PRD.md')));
+  assert.ok(result.files.includes('docs/tasks/accept-invite.md'));
+  assert.ok(result.files.includes('docs/product/PRD.md'));
   assert.match(result.content, /# VCP Context Pack — plan/);
   assert.match(result.content, /## Execution prompt/);
   assert.match(result.content, /## Repository instructions/);
@@ -48,8 +48,8 @@ test('context pack supports explicit includes and safe repository-local output',
     output: '.vcp/context/rotate-key-review.md'
   });
 
-  assert.equal(result.output, path.join('.vcp', 'context', 'rotate-key-review.md'));
-  assert.ok(result.files.includes(path.join('src', 'key-service.md')));
+  assert.equal(result.output, '.vcp/context/rotate-key-review.md');
+  assert.ok(result.files.includes('src/key-service.md'));
   const written = await readFile(path.join(target, result.output), 'utf8');
   assert.match(written, /Prompt: Independent Code Review/);
   assert.match(written, /Preserve rotation audit events/);
@@ -79,6 +79,18 @@ test('context pack rejects repository escape paths and enforces the context budg
     createContextPack({ targetDir: target, task: 'safe-context', maxBytes: 100 }),
     /above the 100-byte limit/
   );
+});
+
+test('context pack exposes portable slash-separated paths on every OS', async () => {
+  const target = await tempDir();
+  await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await createTaskPack({ targetDir: target, slug: 'portable-context' });
+
+  const result = await createContextPack({ targetDir: target, task: 'portable-context', mode: 'implement' });
+  assert.equal(result.task, 'docs/tasks/portable-context.md');
+  assert.ok(result.files.every((relative) => !relative.includes('\\')));
+  assert.match(result.content, /Task: `docs\/tasks\/portable-context\.md`/);
+  assert.match(result.content, /Source: `prompts\/03-implement-task\.md`/);
 });
 
 test('context CLI emits a usable bounded pack', async () => {
