@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/vibe-coding-production.svg)](https://www.npmjs.com/package/vibe-coding-production)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/MoeEyani/Vibe-Coding-Production-Kit?style=social)](https://github.com/MoeEyani/Vibe-Coding-Production-Kit/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/Moeeryani/Vibe-Coding-Production-Kit?style=social)](https://github.com/Moeeryani/Vibe-Coding-Production-Kit/stargazers)
 
 **Vibe Coding Production Kit (VCP)** is a production-minded operating system and zero-runtime-dependency CLI for AI-assisted software development. It turns vague “vibe coding” into a repeatable engineering lifecycle built around specifications, architecture, bounded tasks, repository-native agent rules, readiness gates, security, verification evidence, independent review, safe updates, and recovery.
 
@@ -37,12 +37,41 @@ The executable is also available as `vcp` when installed or invoked through npm 
 If you intentionally want to run the repository version instead of the published npm package:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
+npx --yes github:Moeeryani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
 ```
 
-The CLI requires **Node.js 22+**, has **no runtime dependencies**, and auto-detects TypeScript, Python, and Go only when repository evidence supports that decision.
+The CLI requires **Node.js 22+**, has **no runtime dependencies**, and auto-detects JavaScript/Node.js, TypeScript, Python, and Go only when repository evidence supports that decision.
 
 **New here?** Follow the end-to-end [`10-minute Quickstart`](docs/QUICKSTART.md).
+
+## Use VCP through your coding agent
+
+VCP is intended to be driven primarily by the coding agent rather than by a developer manually filling every template or memorizing every command.
+
+After initialization, you can tell Claude Code, Codex, Cursor, or another compatible agent:
+
+```text
+Set up VCP for this repository. Inspect the existing code, package scripts, tests,
+architecture, and documentation. Draft the VCP source-of-truth files from repository
+evidence. Distinguish discovered facts from proposed decisions, and ask me only for
+decisions that require human product or engineering intent. Run VCP Doctor when done.
+```
+
+For feature work, state the intent normally:
+
+```text
+Use VCP and add verified email change. Draft the task, run the readiness gates,
+ask me only for unresolved product decisions, plan before coding, verify the result,
+and perform an independent review.
+```
+
+The desired split is simple:
+
+```text
+AI does the inspection, drafting, bookkeeping, and VCP command execution.
+Human makes product/engineering decisions and approves important trade-offs.
+VCP preserves the decisions, gates implementation, and records verification evidence.
+```
 
 ## Why this is different
 
@@ -61,8 +90,22 @@ Most vibe-coding workflows optimize for getting the first demo working. VCP opti
 
 ## The daily workflow
 
+What the developer should experience:
+
 ```text
-init
+state intent
+  ↓
+answer only unresolved human decisions
+  ↓
+review / approve plan
+  ↓
+review final result + evidence
+```
+
+What the coding agent executes behind that experience:
+
+```text
+init / inspect
   ↓
 task
   ↓
@@ -171,6 +214,8 @@ npx vibe-coding-production task accept-invite --title "Accept invitation"
 
 The generator creates `docs/tasks/accept-invite.md` with source-of-truth links, acceptance criteria, scope boundaries, security/privacy questions, failure modes, observability, tests, rollout/recovery, implementation planning, review checks, and the verification commands actually configured in `AGENTS.md`.
 
+The coding agent should draft and update this task from repository evidence instead of asking the developer to fill every field manually.
+
 See [`docs/TASK-PACKS.md`](docs/TASK-PACKS.md).
 
 ## Gate readiness before planning and implementation
@@ -180,7 +225,9 @@ vcp ready accept-invite --stage plan
 vcp ready accept-invite --stage implement
 ```
 
-The planning gate requires a real outcome, resolvable Source of Truth, concrete acceptance criteria, and explicit scope. The implementation gate additionally requires resolved architecture/data/integration boundaries, domain invariants, security/privacy, failure modes, observability, testing, rollout/recovery, and a concrete implementation plan.
+The planning gate requires a real outcome, resolvable Source of Truth, concrete acceptance criteria, explicit scope, and an unambiguous task structure. The implementation gate additionally requires resolved architecture/data/integration boundaries, domain invariants, security/privacy, failure modes, observability, testing, rollout/recovery, a concrete implementation plan, and an executable verification plan.
+
+Referenced Source of Truth files that still contain known starter-template signals are reported as warnings so the agent can draft project-specific decisions instead of treating an empty template as evidence.
 
 See [`docs/TASK-READINESS.md`](docs/TASK-READINESS.md).
 
@@ -231,7 +278,7 @@ The example explicitly documents what remains unproven for real production infra
 
 **Do not ask AI to build your project. Build a system that makes it difficult for AI to build your project incorrectly.**
 
-The human owns intent, trade-offs, architecture, risk acceptance, and final decisions. AI helps research, plan, implement, test, review, document, and automate — inside explicit constraints.
+The human owns intent, trade-offs, architecture, risk acceptance, and final decisions. AI helps inspect, draft, research, plan, implement, test, review, document, and automate — inside explicit constraints.
 
 ## The lifecycle
 
@@ -259,7 +306,7 @@ Idea
 
 ## What you get
 
-- `AGENTS.md` — repository-wide rules for coding agents.
+- `AGENTS.md` — repository-wide rules and an AI-first VCP operating protocol for coding agents.
 - Product templates — product brief, PRD, user flows, acceptance criteria.
 - Architecture templates — domain model, system design, data model, ADRs.
 - Security template — threat modeling before implementation.
@@ -275,7 +322,9 @@ Idea
 - GitHub hygiene — issue templates, PR template, contributing guide, security policy, validation workflow.
 - English README plus an Arabic guide.
 
-## Fill source-of-truth documents in this order
+## Establish the source of truth
+
+These are the main project documents VCP manages:
 
 1. `docs/product/PRODUCT-BRIEF.md`
 2. `docs/product/PRD.md`
@@ -286,24 +335,27 @@ Idea
 7. `docs/security/THREAT-MODEL.md`
 8. `docs/testing/TEST-STRATEGY.md`
 
-Then customize `AGENTS.md` with real repository commands for install, format, lint, typecheck, unit/integration tests, build, and E2E.
+Do **not** treat this as a manual form-filling checklist. Have the coding agent inspect repository evidence and draft these files. The developer should approve or correct decisions that require human intent. `AGENTS.md` should likewise be populated from proven repository commands where possible; unresolved commands stay explicit instead of being guessed.
 
 ## Agent execution loop
 
 ```mermaid
 flowchart LR
-    A[Select task] --> B[Read Source of Truth]
-    B --> C[Readiness: plan]
-    C --> D[Build plan context]
-    D --> E[Plan without editing]
-    E --> F[Readiness: implement]
-    F --> G[Implement bounded scope]
-    G --> H[Verification evidence]
-    H --> I[Self-review diff]
-    I --> J[Independent review]
-    J --> K{Quality gates pass?}
-    K -- No --> G
-    K -- Yes --> L[Merge / release / observe]
+    A[Developer states intent] --> B[Agent inspects Source of Truth]
+    B --> C[Agent drafts/updates bounded task]
+    C --> D[Readiness: plan]
+    D --> E[Build plan context]
+    E --> F[Plan without editing]
+    F --> G{Human decision needed?}
+    G -- Yes --> H[Ask focused decision]
+    H --> F
+    G -- No --> I[Readiness: implement]
+    I --> J[Implement bounded scope]
+    J --> K[Verification evidence]
+    K --> L[Independent review]
+    L --> M{Quality gates pass?}
+    M -- No --> J
+    M -- Yes --> N[Merge / release / observe]
 ```
 
 ## Repository map
@@ -346,6 +398,7 @@ flowchart LR
 9. **CI is the mechanical source of truth when CI is available.**
 10. **Production must be observable and recoverable.**
 11. **Lifecycle upgrades are planned and reversible; templates are not blindly recopied.**
+12. **Do not make the developer write information the agent can reliably discover or draft.**
 
 ## Suggested task size
 
@@ -368,7 +421,7 @@ Do not duplicate conflicting rules across multiple agent configuration files. Pr
 
 ## Roadmap
 
-- [x] CLI bootstrap with evidence-based TypeScript/Python/Go profiles
+- [x] CLI bootstrap with evidence-based JavaScript/TypeScript/Python/Go profiles
 - [x] Context-aware task pack generator
 - [x] Two-stage task readiness gate
 - [x] Phase-specific bounded context packs
