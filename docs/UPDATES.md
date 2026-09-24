@@ -46,7 +46,7 @@ vcp update . --check --json
 
 With `--offline`, VCP does not claim to know the npm registry's latest version. It compares the project only with the running CLI and reports `registryChecked: false` in JSON.
 
-A newer npm version is not applied by an older CLI. VCP prints a version-pinned `npx` command so the target templates and migration code come from the version being installed. If the running CLI is already newer than the registry version, VCP never recommends downgrading to the registry copy.
+A newer npm version is not applied by an older CLI. VCP prints a version-pinned `npx` command so the target templates and migration code come from the version being installed. If the running CLI is already newer than the registry version, VCP never recommends downgrading to the registry copy. The delegated command targets the project path that was actually checked rather than assuming the current directory.
 
 ## Preview before writing
 
@@ -100,13 +100,17 @@ Restore the newest VCP backup:
 vcp rollback .
 ```
 
-Or a specific backup:
+The optional backup id may be used to name that same newest recovery point explicitly:
 
 ```bash
-vcp rollback . --backup <id>
+vcp rollback . --backup <latest-id>
 ```
 
-Rollback restores files, the manifest, and baseline snapshots. It also clears interrupted transaction/lock state. Rollback itself acquires the update lock so it cannot race a live updater.
+If an interrupted transaction exists, rollback is pinned to the backup recorded by that transaction. VCP refuses a different backup id in that state.
+
+VCP v0.9 intentionally does **not** allow jumping directly to an older historical backup. A backup captures the files touched by its update plus the manifest/baselines; later updates may have changed additional managed paths. Restoring an older delta snapshot directly could therefore create a manifest/filesystem mismatch. Older backup directories are retained for inspection, but the supported rollback contract is the newest backup or the interrupted transaction's backup.
+
+Rollback restores the backed-up files, the manifest, and baseline snapshots. It also clears interrupted transaction/lock state. Rollback itself acquires the update lock so it cannot race a live updater.
 
 ## Three-way merge
 
@@ -116,7 +120,7 @@ For mergeable files VCP compares:
 - local: the current project file;
 - target: the new VCP template.
 
-Independent edits can merge automatically. Overlapping edits are reported as `CONFLICT`; VCP does not choose a winner or silently overwrite project changes.
+Independent edits can merge automatically. Overlapping edits are reported as `CONFLICT`; VCP does not choose a winner or silently overwrite project changes. Final-newline intent is merged with the same three-way semantics instead of being forced on or off by either side.
 
 Automatic merge work is bounded. Files large enough to make the line-based LCS merge unreasonably expensive are reported as `CONFLICT` for manual resolution rather than allowing unbounded memory use.
 
