@@ -2,6 +2,8 @@
 
 The CLI bootstraps the Vibe Coding Production Kit into a new or existing repository, manages its lifecycle state, and provides task/readiness/context/verification workflows without replacing unrelated files.
 
+The preferred human experience is agent-first: let the coding agent inspect the repository, draft VCP artifacts, run these commands, and ask the developer only for unresolved decisions that require human intent.
+
 ## Run from npm
 
 The published package is the primary installation path:
@@ -15,7 +17,7 @@ The installed executable is also available as `vcp`.
 To run the current GitHub source instead of the published package, use:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
+npx --yes github:Moeeryani/Vibe-Coding-Production-Kit init . --agent all
 ```
 
 ## Initialize once, then update
@@ -122,7 +124,7 @@ The CLI asks for:
 
 1. target directory;
 2. AI coding tool;
-3. stack profile (auto/generic/typescript/python/go);
+3. stack profile (auto/generic/javascript/typescript/python/go);
 4. whether GitHub issue/PR/validation files should be installed.
 
 ## Non-interactive examples
@@ -150,7 +152,9 @@ npx vibe-coding-production init . --agent all --stack auto --yes
 npx vibe-coding-production task accept-invite --title "Accept invitation"
 ```
 
-The task generator writes `docs/tasks/<slug>.md`, refuses overwrite unless `--force` is used, supports `--dry-run`, and imports concrete verification commands from `AGENTS.md`. See [`TASK-PACKS.md`](TASK-PACKS.md).
+The task generator writes `docs/tasks/<slug>.md`, refuses overwrite unless `--force` is used, supports `--dry-run`, and imports concrete verification commands from `AGENTS.md`. Reasoned non-applicable values such as `n/a — no E2E surface` are treated as decisions, not executable shell commands.
+
+The coding agent should populate and maintain the task from repository evidence instead of asking the developer to fill every section manually. See [`TASK-PACKS.md`](TASK-PACKS.md).
 
 ## Gate task readiness
 
@@ -161,7 +165,9 @@ vcp ready accept-invite --stage plan
 vcp ready accept-invite --stage implement
 ```
 
-The planning gate blocks missing outcome, Source of Truth, acceptance criteria, or scope. The implementation gate additionally requires resolved architecture/data/integration boundaries, domain invariants, security/privacy, failure modes, observability, test coverage, rollout/recovery, and an implementation plan. Use `--json` for automation and `--strict` to make warnings non-zero. See [`TASK-READINESS.md`](TASK-READINESS.md).
+The planning gate blocks missing outcome, Source of Truth, acceptance criteria, scope, or ambiguous duplicate task sections. Referenced Source of Truth files that still contain known starter-template signals are reported as warnings.
+
+The implementation gate additionally requires resolved architecture/data/integration boundaries, domain invariants, security/privacy, failure modes, observability, test coverage, rollout/recovery, an implementation plan, and at least one executable task verification command so `vcp verify` can build a plan. Use `--json` for automation and `--strict` to make warnings non-zero. See [`TASK-READINESS.md`](TASK-READINESS.md).
 
 ## Build a bounded AI context pack
 
@@ -209,7 +215,7 @@ Before using bootstrap `--force`, inspect the reported conflicts. The CLI never 
 
 ```text
 --agent <name>     generic | codex | cursor | claude | copilot | all
---stack <name>     auto | generic | typescript | python | go
+--stack <name>     auto | generic | javascript | typescript | python | go
 --yes, -y          non-interactive initialization
 --force            explicit overwrite where that command supports it
 --no-github        skip GitHub issue/PR/workflow files during init
@@ -238,4 +244,4 @@ Before using bootstrap `--force`, inspect the reported conflicts. The CLI never 
 
 Node.js 22 or newer. The CLI has no runtime dependencies.
 
-See [`STACK-PROFILES.md`](STACK-PROFILES.md) for evidence-based TypeScript, Python, and Go adaptation.
+See [`STACK-PROFILES.md`](STACK-PROFILES.md) for evidence-based JavaScript/Node.js, TypeScript, Python, and Go adaptation.
