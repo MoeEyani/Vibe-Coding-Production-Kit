@@ -2,98 +2,284 @@
 
 > ابنِ بالذكاء الاصطناعي كفريق هندسي، لا كمحادثة طويلة.
 
-**Vibe Coding Production Kit** هو نظام عمل احترافي لتحويل الـVibe Coding من “اكتب برومبت ودع الوكيل يبني كل شيء” إلى هندسة برمجيات منضبطة: مواصفات، معمارية، مهام صغيرة، اختبارات، مراجعة، أمن، CI، وإطلاق قابل للمراقبة والاسترجاع.
+**Vibe Coding Production Kit (VCP)** هو نظام تشغيل هندسي وCLI خفيف لبناء البرمجيات بالـAI من الفكرة إلى الإنتاج، ثم الاستمرار في تطوير المشروع وترقية نظام VCP نفسه بأمان.
 
-## الفكرة الأساسية
+بدلاً من أن يكون الـPrompt هو مصدر الحقيقة، يجعل VCP المستودع نفسه هو مصدر الحقيقة: مواصفات، معمارية، Tasks محددة، قواعد للوكلاء، بوابات جاهزية، أمن، Verification Evidence، مراجعة مستقلة، CI، ثم lifecycle updates قابلة للمراجعة والاسترجاع.
 
-**لا تطلب من الـAI أن يبني المشروع؛ ابنِ نظاماً يجعل من الصعب عليه أن يبنيه بطريقة خاطئة.**
+يعمل مع Codex وClaude Code وCursor وGitHub Copilot وأدوات البرمجة الوكيلة الأخرى، بدون ربط المنهج بموديل واحد.
 
-الإنسان يملك القرارات والنية والمخاطر والمفاضلات. والـAI يساعد في البحث والتخطيط والتنفيذ والاختبار والمراجعة والتوثيق ضمن حدود واضحة.
+## تشغيل خلال دقيقة
 
-## تشغيل سريع خلال دقيقة
-
-يمكن تشغيل الـCLI مباشرة من GitHub بدون تثبيت عالمي:
+قبل أول نشر رسمي على npm، شغّل الـCLI مباشرة من GitHub:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
+  init . --agent all --stack auto --yes
 ```
 
 أو لمشروع آخر:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init ./my-app --agent claude --stack auto --yes
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
+  init ./my-app --agent claude --stack auto --yes
 ```
 
-الـCLI لا يعتمد على مكتبات runtime خارجية، ولا يكتب فوق ملفات موجودة إلا عند استخدام `--force` صراحة. كما يستطيع `--stack auto` اكتشاف TypeScript وPython وGo وملء أوامر التحقق التي يمكن إثباتها من ملفات المشروع فقط. ويمكن استخدام `--dry-run` لمشاهدة ما سيتم إنشاؤه قبل أي تعديل. التفاصيل في `docs/CLI.md` و`docs/STACK-PROFILES.md`.
-
-**إذا كانت هذه أول مرة تستخدم المشروع:** ابدأ من [`docs/QUICKSTART.md`](docs/QUICKSTART.md) لمسار عملي من التهيئة إلى Task محددة، readiness، context، verification evidence، والمراجعة المستقلة.
-
-## فحص مشروع موجود
-
-يوجد أيضاً أمر `doctor` للقراءة فقط، يميّز بين وجود القوالب وبين إعدادها فعلياً:
+للمعاينة بدون كتابة أي ملف:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-production doctor .
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
+  init . --agent all --stack auto --dry-run
 ```
 
-يعرض `PASS / WARN / FAIL` لأوامر التحقق، ملفات الـSource of Truth، القوالب التي ما زالت غير مخصصة، CI، ودورة التخطيط/المراجعة. استخدم `--json` للأتمتة و`--strict` لجعل التحذيرات تفشل في CI. التفاصيل في `docs/DOCTOR.md`.
-
-## أنشئ Task محددة قبل كتابة الكود
+بعد أول نشر على npm سيصبح الاختصار:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production task accept-invite --title "Accept invitation"
+npx vibe-coding-production init . --agent all --stack auto --yes
 ```
 
-ينشئ الأمر `docs/tasks/accept-invite.md` وفيه مصادر الحقيقة، Acceptance Criteria، حدود الـscope، أسئلة الأمن والـtenant isolation، الحالات الطرفية، خطة الاختبارات، rollout/recovery، قسم تخطيط يجب تعبئته قبل تعديل الكود، checklist للمراجعة المستقلة، وأوامر التحقق الفعلية الموجودة في `AGENTS.md`. التفاصيل في `docs/TASK-PACKS.md`.
+المتطلبات: **Node.js 22+**. الـCLI لا يملك runtime dependencies خارجية.
 
-## افصل بين الجاهزية للتخطيط والجاهزية للتنفيذ
+إذا كانت هذه أول مرة تستخدم المشروع، ابدأ من [`docs/QUICKSTART.md`](docs/QUICKSTART.md).
 
-وجود ملف Task لا يعني أن الوقت حان لكتابة الكود. افحص المرحلتين بشكل مستقل:
+## لماذا هذا مختلف عن Vibe Coding العادي؟
 
-```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production ready accept-invite --stage plan
+الـVibe Coding العادي غالباً ينجح في أول Demo، لكنه يبدأ بالتدهور عندما يصل المشروع إلى عشرات Features، أكثر من مطور، migrations، production incidents، security reviews، refactors، وترقيات مستمرة.
 
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production ready accept-invite --stage implement
+| Vibe Coding عادي | Vibe Coding Production Kit |
+| --- | --- |
+| الـPrompt هو المرجع | ملفات المستودع هي Source of Truth |
+| “ابنِ التطبيق” | Tasks صغيرة ومحددة |
+| يبدأ الوكيل بالكود فوراً | Readiness + plan-before-code |
+| “الاختبارات يجب أن تعمل” | Verification Evidence منفذة فعلياً |
+| نفس الوكيل يبني ويراجع | Independent Review |
+| نسخ Templates مرة واحدة | Lifecycle state وإصدارات قابلة للترقية |
+| إعادة نسخ الملفات عند التحديث | Baselines + merge + migrations + rollback |
+| Production بعد التفكير في النهاية | Security/observability/recovery من البداية |
+
+## المسار اليومي
+
+```text
+init
+  ↓
+task
+  ↓
+ready --stage plan
+  ↓
+context --mode plan
+  ↓
+plan
+  ↓
+ready --stage implement
+  ↓
+context --mode implement
+  ↓
+implement
+  ↓
+verify
+  ↓
+independent review
+  ↓
+doctor
+  ↓
+release / observe
 ```
 
-مرحلة `plan` تمنع التخطيط إذا كان Outcome أو Source of Truth أو Acceptance Criteria أو حدود الـscope ناقصة. مرحلة `implement` أكثر صرامة: تشترط أيضاً حسم الحدود المعمارية والبيانات والتكاملات، الأمن والخصوصية، الحالات السلبية، Observability، خطة الاختبارات، rollout/recovery، وخطة تنفيذ فعلية. التقرير يستخدم `PASS / WARN / FAIL` مع طريقة الإصلاح ولا يخفي النواقص وراء رقم واحد. التفاصيل في `docs/TASK-READINESS.md`.
+وعند صدور VCP أحدث:
 
-## حوّل عبارة «شغّلت الاختبارات» إلى Evidence
-
-اعرض أولاً أوامر التحقق الدقيقة المرتبطة بالـTask بدون تنفيذ أي شيء:
-
-```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production verify accept-invite
+```text
+update --check
+  ↓
+update --dry-run
+  ↓
+حل أي conflict
+  ↓
+update
+  ↓
+doctor
 ```
 
-التنفيذ يحتاج `--run` صريحاً، ويرفض البدء إذا لم تجتز الـTask بوابة `ready --stage implement`:
+## التحديثات الآمنة — v0.9
+
+ابتداءً من v0.9، ينشئ `vcp init` حالة lifecycle داخل:
+
+```text
+.vcp/
+├── manifest.json
+└── baselines/
+```
+
+يسجل الـmanifest إصدار VCP المثبت، إعدادات التهيئة، الملفات التي يديرها VCP، سياسة كل ملف، والبصمة والـbaseline الأصلية.
+
+بعد ذلك لا يسمح VCP بإعادة تهيئة المشروع فوق هذه الحالة حتى مع `init --force`. الترقية تمر عبر update engine:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production verify accept-invite --run \
+vcp update . --check
+vcp update . --dry-run
+vcp update .
+```
+
+الـdry-run يصنف الملفات إلى حالات واضحة مثل:
+
+```text
+NOOP
+ADD
+UPDATE
+MERGE
+RENAME
+DELETE
+ADOPT
+DETACH
+PRESERVE
+IGNORED
+CONFLICT
+```
+
+إذا وجد أي `CONFLICT`، يتوقف التطبيق قبل تعديل ملفات المشروع.
+
+### كيف يحمي تعديلاتك؟
+
+VCP يقارن ثلاث نسخ:
+
+```text
+baseline = النسخة التي ثبتها VCP سابقاً
+local    = نسخة المشروع الحالية
+ target   = Template الإصدار الجديد
+```
+
+إذا كانت التعديلات مستقلة يمكن دمجها تلقائياً. إذا تداخلت، تصبح `CONFLICT` بدلاً من اختيار نسخة عشوائياً.
+
+كما أن الملفات ليست كلها متساوية:
+
+- `managed`: يمكن تحديثها ودمجها عندما يكون ذلك آمناً.
+- `generated`: ملفات adapters مولدة؛ التعديل المحلي + upstream يصبح conflict.
+- `preserve`: ملفات قرارات المشروع مثل PRD/Architecture؛ بعد تخصيصها لا يستبدلها VCP بقالب جديد.
+- `ignored`: ملفات أخرجها المستخدم صراحة من إدارة VCP.
+
+### الاسترجاع
+
+كل update فعلي يستخدم lock وtransaction state وbackup قبل التطبيق، ثم يتحقق من النتيجة بعد الكتابة.
+
+```bash
+vcp rollback .
+```
+
+v0.9 يتعمد دعم أحدث recovery point الآمن فقط، أو الـbackup المرتبط بمعاملة update متوقفة. لا يدّعي أن backup قديم جزئي يمثل Snapshot كاملة للمشروع.
+
+### إدارة ملف واحد
+
+```bash
+vcp manage ignore AGENTS.md
+vcp manage track AGENTS.md
+```
+
+`ignore` يفصل الملف عن إدارة VCP بدون حذف محتواه المحلي. `track` يعيده للإدارة. أوامر manage وupdate وrollback تستخدم نفس lifecycle lock حتى لا تتسابق على manifest والباسلاين.
+
+التفاصيل الكاملة في [`docs/UPDATES.md`](docs/UPDATES.md) و[`docs/CLI.md`](docs/CLI.md).
+
+## فحص المشروع بـDoctor
+
+```bash
+vcp doctor .
+```
+
+لا يعطي Doctor “درجة سحرية”، بل يعرض `PASS / WARN / FAIL` مع سبب وطريقة إصلاح.
+
+يفحص مثلاً:
+
+- `AGENTS.md` وأوامر التحقق؛
+- Source of Truth؛
+- القوالب التي ما زالت غير مخصصة؛
+- CI والـplan/review loop؛
+- VCP manifest؛
+- توافق الإصدار؛
+- baseline integrity؛
+- interrupted/corrupt update transaction.
+
+استخدم `--json` للأتمتة و`--strict` لجعل التحذيرات تعطي exit code غير صفري.
+
+## أنشئ Task محددة قبل الكود
+
+```bash
+vcp task accept-invite --title "Accept invitation"
+```
+
+ينشئ `docs/tasks/accept-invite.md` ويضع فيه:
+
+- Source of Truth؛
+- Acceptance Criteria؛
+- In Scope / Out of Scope؛
+- Architecture/Data/Integration boundaries؛
+- Security/Privacy؛
+- Edge cases وفشل متوقع؛
+- Observability؛
+- Test plan؛
+- Rollout/Recovery؛
+- Implementation plan؛
+- Independent review checklist؛
+- أوامر التحقق الفعلية من `AGENTS.md`.
+
+## افصل الجاهزية للتخطيط عن الجاهزية للتنفيذ
+
+```bash
+vcp ready accept-invite --stage plan
+vcp ready accept-invite --stage implement
+```
+
+`plan` يتأكد أن المشكلة والنطاق ومعايير القبول ومصادر الحقيقة جاهزة.
+
+`implement` أكثر صرامة، ويشترط أيضاً حسم الحدود المعمارية، invariants، الأمن والخصوصية، الحالات السلبية، observability، الاختبارات، rollout/recovery، وخطة تنفيذ فعلية.
+
+## أعطِ الـAI أقل Context كافٍ
+
+```bash
+vcp context accept-invite --mode plan
+```
+
+ثم استخدم:
+
+```text
+implement
+review
+security
+release
+```
+
+كـmodes حسب المرحلة.
+
+بدلاً من إرسال المستودع كله إلى الوكيل، يجمع VCP الـTask و`AGENTS.md` وPrompt المرحلة وSource of Truth فقط، ويمكن إضافة ملفات التنفيذ صراحة عبر `--include`.
+
+## حوّل “شغلت الاختبارات” إلى Evidence
+
+اعرض ما سيتم تشغيله أولاً:
+
+```bash
+vcp verify accept-invite
+```
+
+التنفيذ يحتاج موافقة صريحة:
+
+```bash
+vcp verify accept-invite --run \
   --output .vcp/evidence/accept-invite.json
 ```
 
-تعمل الأوامر بالتسلسل وتتوقف بعد أول فشل. ملف الـEvidence يسجل الأمر الفعلي والحالة وexit code والمدة والـtimeout، لكنه لا يحفظ stdout/stderr افتراضياً لتقليل خطر تسريب secrets أو PII. التفاصيل في `docs/VERIFICATION-EVIDENCE.md`.
+يرفض التنفيذ إذا لم تجتز الـTask `ready --stage implement`.
 
-## ابنِ Context محدداً لكل مرحلة
-
-بدلاً من إرسال المستودع كاملاً إلى الـAI، اجمع أقل سياق كافٍ للمهمة والمرحلة:
-
-```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production context accept-invite --mode plan
-```
-
-الأمر يجمع الـTask و`AGENTS.md` وPrompt المرحلة وملفات Source of Truth الموجودة فعلياً. عند التنفيذ أو المراجعة أضف فقط الملفات المتأثرة باستخدام `--include` عدة مرات. الأداة تمنع القراءة/الكتابة خارج جذر المشروع وتطبق حد حجم افتراضياً حتى لا يتحول السياق إلى dump ضخم. التفاصيل في `docs/CONTEXT-PACKS.md`.
+الأوامر تعمل بالتسلسل وتتوقف عند أول فشل. الـEvidence يسجل الأمر والحالة وexit code والـsignal والـtimeout والمدة، لكنه لا يحفظ stdout/stderr افتراضياً لتقليل خطر تسريب secrets أو PII.
 
 ## مثال تطبيقي مكتمل
 
-لرؤية النظام مطبقاً على Feature حقيقية بدلاً من قوالب فارغة، راجع `examples/reference-saas-invite/`. المثال يغطي دعوة أعضاء في SaaS متعدد المستأجرين مع PRD وDomain/Data/Architecture وADR وThreat Model وTest Strategy وTask محددة وكود طبقي واختبارات للحالات السلبية مثل cross-tenant وreplay وexpiry وemail mismatch.
+راجع:
+
+[`examples/reference-saas-invite/`](examples/reference-saas-invite/)
+
+وهو Vertical Slice لدعوة أعضاء في SaaS متعدد المستأجرين، ويحتوي Product Brief وPRD وUser Flows وDomain/Data/Architecture وADR وThreat Model وTest Strategy وTask محددة وكود واختبارات للحالات السلبية مثل:
+
+- cross-tenant access؛
+- replay؛
+- expired tokens؛
+- email mismatch؛
+- authorization boundaries.
 
 ```bash
 cd examples/reference-saas-invite
@@ -101,9 +287,15 @@ npm test
 npm run check
 ```
 
-المثال يذكر صراحة ما لم يثبته بعد على مستوى قاعدة البيانات والـHTTP والمصادقة والبنية التشغيلية، بدلاً من وصف Demo على أنه Production-ready.
+المثال يذكر صراحة ما لم يتم إثباته على مستوى البنية التحتية الحقيقية، بدلاً من وصف Demo بأنه Production-ready.
 
-## المسار الكامل
+## المبدأ الأساسي
+
+**لا تطلب من الـAI أن يبني المشروع؛ ابنِ نظاماً يجعل من الصعب عليه أن يبنيه بطريقة خاطئة.**
+
+الإنسان يملك النية والقرارات والمفاضلات والمخاطر. والـAI يساعد في البحث والتخطيط والتنفيذ والاختبار والمراجعة والتوثيق والأتمتة داخل حدود واضحة.
+
+## دورة المشروع الكاملة
 
 ```text
 الفكرة
@@ -115,20 +307,35 @@ npm run check
   -> Data Model
   -> Threat Model
   -> Test Strategy
-  -> Epics / Stories / Tasks
+  -> Epics / Stories / Bounded Tasks
+  -> Readiness Gate
   -> Plan Before Code
   -> Implementation
-  -> Automated Verification
+  -> Verification Evidence
   -> Independent Review
   -> CI Gates
-  -> Staging / Production
-  -> Observability
-  -> تحسين مستمر
+  -> Release + Observability
+  -> Safe VCP Updates
+  -> تحديث Source of Truth
 ```
 
-## ابدأ من هنا
+## أهم ما يوفره المشروع
 
-املأ الملفات بهذا الترتيب:
+- `AGENTS.md`: قواعد المستودع لوكلاء البرمجة.
+- Product/PRD/User Flow templates.
+- Domain/Architecture/Data/ADR templates.
+- Threat Model وTest Strategy.
+- Definition of Ready / Definition of Done.
+- `vcp task` لإنشاء مهام محددة.
+- `vcp ready` لبوابات الجاهزية.
+- `vcp context` لبناء سياق محدود.
+- `vcp verify` لإثبات التحقق.
+- `vcp doctor` لفحص النظام.
+- `vcp update` للترقيات الآمنة.
+- Prompts مستقلة للتخطيط والتنفيذ والمراجعة والأمن والإطلاق.
+- GitHub Issue/PR templates وvalidation workflow.
+
+## املأ Source of Truth بهذا الترتيب
 
 1. `docs/product/PRODUCT-BRIEF.md`
 2. `docs/product/PRD.md`
@@ -139,67 +346,43 @@ npm run check
 7. `docs/security/THREAT-MODEL.md`
 8. `docs/testing/TEST-STRATEGY.md`
 
-ثم عدّل `AGENTS.md` ليحتوي أوامر مشروعك الحقيقية للبناء والاختبار والـlint والـtypecheck.
-
-## قاعدة تنفيذ كل Task
-
-لا تبدأ بالكود مباشرة. اجعل الوكيل أولاً:
-
-1. يقرأ `AGENTS.md` والوثائق المرتبطة بالمهمة.
-2. يعيد صياغة المطلوب.
-3. يحدد الملفات والموديولات المتأثرة.
-4. يقترح خطة تنفيذ.
-5. يذكر المخاطر والحالات الطرفية.
-6. يحدد الاختبارات المطلوبة.
-7. يذكر أي تعارض معماري.
-
-بعد الموافقة على الخطة، ينفذ **نطاق المهمة فقط**، ثم يشغل التحقق الآلي، ثم يراجع الـdiff، ثم يمر التغيير على Reviewer مستقل.
-
-## الفرق عن Vibe Coding العادي
-
-بدلاً من:
-
-```text
-Prompt -> كود كثير -> يبدو أنه يعمل
-```
-
-نستخدم:
-
-```text
-Source of Truth
-      +
-Small Scoped Tasks
-      +
-Agent Rules
-      +
-Automated Tests
-      +
-Independent Review
-      +
-CI Gates
-```
-
-## أهم الملفات
-
-- `AGENTS.md`: دستور وكلاء البرمجة داخل المستودع.
-- `docs/product/PRD.md`: السلوك والمتطلبات ومعايير القبول.
-- `docs/architecture/ARCHITECTURE.md`: الحدود والاعتماديات والتصميم العام.
-- `docs/architecture/adr/ADR-TEMPLATE.md`: تسجيل القرارات المعمارية وأسبابها.
-- `docs/security/THREAT-MODEL.md`: تهديدات وضوابط قبل التنفيذ.
-- `docs/delivery/DEFINITION-OF-READY.md`: متى تصبح المهمة جاهزة للبرمجة.
-- `docs/delivery/DEFINITION-OF-DONE.md`: متى تعتبر المهمة منتهية فعلاً.
-- `prompts/`: برومبتات تشغيلية للوكيل في كل مرحلة.
+ثم عدّل `AGENTS.md` بأوامر المشروع الحقيقية للـinstall/format/lint/typecheck/tests/build/E2E.
 
 ## قواعد لا نتنازل عنها
 
 - لا Feature بدون Acceptance Criteria واضحة.
 - لا قرار معماري مهم يبقى داخل Chat فقط.
 - لا Task ضخمة وغير محددة للـAI.
-- لا ثقة بعبارة “Everything should work”. الاختبارات وCI هما الحكم.
+- لا تبدأ implementation قبل readiness والخطة.
+- لا تثق بعبارة “Everything should work”؛ التحقق المنفذ هو الحكم.
 - لا Authorization في الواجهة فقط.
-- لا Migration إنتاجية بدون مراجعة ومراعاة rollback.
+- لا Migration إنتاجية بدون مراجعة وrollback thinking.
 - لا Refactor غير مرتبط داخل Feature PR.
-- لا تعتمد على الوكيل الذي كتب الكود كمراجع وحيد له.
+- لا تعتمد على الوكيل الذي كتب الكود كمراجع وحيد.
+- لا Upgrade عبر نسخ Templates فوق تعديلات المشروع.
 - أي نظام Production يجب أن يكون قابلاً للمراقبة والتشخيص والاسترجاع.
 
-للتفاصيل الكاملة ابدأ من `docs/00-START-HERE.md`.
+## Roadmap
+
+- [x] CLI bootstrap
+- [x] TypeScript/Python/Go stack profiles
+- [x] Task Packs
+- [x] Readiness Gates
+- [x] Context Packs
+- [x] Verification Evidence
+- [x] Doctor
+- [x] Reference vertical slice
+- [x] Versioned lifecycle state
+- [x] Safe `vcp update`
+- [x] Three-way merge + migrations + backup/rollback + manage
+- [ ] Mobile stack profiles
+- [ ] Monorepo/CI profiles
+- [ ] Security profiles
+- [ ] Git-aware review/release automation
+- [ ] Prompt evaluation suite
+- [ ] Architecture fitness functions
+- [ ] Community profile/plugin system
+
+## الترخيص
+
+MIT — يمكنك استخدامه في المشاريع الشخصية والتجارية ومشاريع المصادر المفتوحة.
