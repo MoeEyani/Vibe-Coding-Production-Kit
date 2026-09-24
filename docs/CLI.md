@@ -2,21 +2,21 @@
 
 The CLI bootstraps the Vibe Coding Production Kit into a new or existing repository, manages its lifecycle state, and provides task/readiness/context/verification workflows without replacing unrelated files.
 
-## Run directly from GitHub
+## Run from npm
 
-Until the npm package is published, npm can execute the package directly from this GitHub repository:
+The published package is the primary installation path:
+
+```bash
+npx vibe-coding-production init . --agent all
+```
+
+The installed executable is also available as `vcp`.
+
+To run the current GitHub source instead of the published package, use:
 
 ```bash
 npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
 ```
-
-After an npm release, the shorter command will be:
-
-```bash
-npx vibe-coding-production init
-```
-
-The installed executable is also available as `vcp`.
 
 ## Initialize once, then update
 
@@ -115,7 +115,7 @@ See [`DOCTOR.md`](DOCTOR.md) for JSON output and strict CI behavior.
 ## Interactive setup
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init
+npx vibe-coding-production init
 ```
 
 The CLI asks for:
@@ -129,26 +129,25 @@ The CLI asks for:
 
 ```bash
 # Codex — AGENTS.md is used directly
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent codex --yes
+npx vibe-coding-production init . --agent codex --yes
 
 # Cursor — AGENTS.md is used directly
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent cursor --yes
+npx vibe-coding-production init . --agent cursor --yes
 
 # Claude Code — adds a thin CLAUDE.md adapter
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent claude --yes
+npx vibe-coding-production init . --agent claude --yes
 
 # GitHub Copilot — adds .github/copilot-instructions.md
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent copilot --yes
+npx vibe-coding-production init . --agent copilot --yes
 
 # Multi-tool repository with stack auto-detection
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
+npx vibe-coding-production init . --agent all --stack auto --yes
 ```
 
 ## Create a bounded task pack
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production task accept-invite --title "Accept invitation"
+npx vibe-coding-production task accept-invite --title "Accept invitation"
 ```
 
 The task generator writes `docs/tasks/<slug>.md`, refuses overwrite unless `--force` is used, supports `--dry-run`, and imports concrete verification commands from `AGENTS.md`. See [`TASK-PACKS.md`](TASK-PACKS.md).
@@ -167,8 +166,7 @@ The planning gate blocks missing outcome, Source of Truth, acceptance criteria, 
 ## Build a bounded AI context pack
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production context accept-invite --mode plan
+npx vibe-coding-production context accept-invite --mode plan
 ```
 
 `context` combines the task, `AGENTS.md`, the phase-specific operating prompt, and existing files referenced in the task's Source of Truth. Add current implementation files explicitly with repeatable `--include` flags. Print to stdout or use `--output` to save a pack inside the repository. See [`CONTEXT-PACKS.md`](CONTEXT-PACKS.md).

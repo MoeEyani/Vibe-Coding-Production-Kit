@@ -2,6 +2,7 @@
 
 > Build with AI like an engineering team — not like a chat session.
 
+[![npm version](https://img.shields.io/npm/v/vibe-coding-production.svg)](https://www.npmjs.com/package/vibe-coding-production)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/MoeEyani/Vibe-Coding-Production-Kit?style=social)](https://github.com/MoeEyani/Vibe-Coding-Production-Kit/stargazers)
 
@@ -13,30 +14,30 @@ It is model-agnostic and works with tools such as Codex, Claude Code, Cursor, Gi
 
 ## Start in 60 seconds
 
-Before the first npm release, run the CLI directly from GitHub — no global install required:
+Run the published npm package directly — no global install required:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
+npx vibe-coding-production init . --agent all --stack auto --yes
 ```
 
 Or target another repository:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
-  init ./my-app --agent claude --stack auto --yes
+npx vibe-coding-production init ./my-app --agent claude --stack auto --yes
 ```
 
 Preview without writing:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
-  init . --agent all --stack auto --dry-run
+npx vibe-coding-production init . --agent all --stack auto --dry-run
 ```
 
-After the first npm release, the shorter form will be:
+The executable is also available as `vcp` when installed or invoked through npm package tooling.
+
+If you intentionally want to run the repository version instead of the published npm package:
 
 ```bash
-npx vibe-coding-production init . --agent all --stack auto --yes
+npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
 ```
 
 The CLI requires **Node.js 22+**, has **no runtime dependencies**, and auto-detects TypeScript, Python, and Go only when repository evidence supports that decision.
@@ -155,8 +156,7 @@ See [`docs/UPDATES.md`](docs/UPDATES.md) for the full contract and [`docs/CLI.md
 The read-only doctor checks whether the engineering system is actually configured—not merely copied:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production doctor .
+npx vibe-coding-production doctor .
 ```
 
 It reports concrete `PASS / WARN / FAIL` findings for agent instructions, unresolved verification commands, source-of-truth documents, untouched templates, CI, plan/review workflow, manifest compatibility, baseline integrity, and interrupted update transactions.
@@ -166,8 +166,7 @@ Use `--json` for automation or `--strict` to make warnings non-zero. See [`docs/
 ## Create a bounded task before coding
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
-  vibe-coding-production task accept-invite --title "Accept invitation"
+npx vibe-coding-production task accept-invite --title "Accept invitation"
 ```
 
 The generator creates `docs/tasks/accept-invite.md` with source-of-truth links, acceptance criteria, scope boundaries, security/privacy questions, failure modes, observability, tests, rollout/recovery, implementation planning, review checks, and the verification commands actually configured in `AGENTS.md`.
