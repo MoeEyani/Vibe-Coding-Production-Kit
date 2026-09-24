@@ -1,8 +1,8 @@
 # Quickstart — from repository to verified AI task
 
-This is the shortest end-to-end path through Vibe Coding Production Kit.
+Vibe Coding Production Kit is designed to be driven primarily by your AI coding agent, not by a developer manually filling every template or memorizing every CLI command.
 
-The goal is not to generate a whole application in one prompt. The goal is to establish enough engineering structure that an AI coding agent can work on one bounded task with explicit requirements, context, and verification.
+The developer provides intent and approves decisions. The agent inspects the repository, drafts the engineering context, runs VCP gates, implements bounded work, and verifies the result.
 
 ## 1. Bootstrap the kit
 
@@ -23,98 +23,116 @@ The initializer does not overwrite framework-managed files unless `--force` is e
 If you specifically want to run the current GitHub source instead of the published npm package, use:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
+npx --yes github:Moeeryani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
 ```
 
-## 2. Establish the source of truth
+## 2. Let the agent establish the source of truth
 
-Complete these files before asking an agent to build meaningful product behavior:
+Do not start by manually filling every Markdown template. Ask your coding agent to set up VCP for the repository.
 
-1. `docs/product/PRODUCT-BRIEF.md`
-2. `docs/product/PRD.md`
-3. `docs/product/USER-FLOWS.md`
-4. `docs/architecture/DOMAIN.md`
-5. `docs/architecture/ARCHITECTURE.md`
-6. `docs/architecture/DATA-MODEL.md`
-7. `docs/security/THREAT-MODEL.md`
-8. `docs/testing/TEST-STRATEGY.md`
-
-Also make sure `AGENTS.md` contains the repository's real verification commands. `--stack auto` fills only commands it can infer from repository evidence; unresolved commands stay explicit instead of being guessed.
-
-## 3. Create one bounded task
-
-```bash
-npx vibe-coding-production task accept-invite \
-  --title "Accept organization invitation"
-```
-
-This creates:
+Example instruction:
 
 ```text
-docs/tasks/accept-invite.md
+Set up VCP for this repository. Inspect the existing code, package scripts, tests,
+architecture, and documentation. Draft the VCP source-of-truth files from repository
+evidence. Distinguish discovered facts from proposed decisions, and ask me only for
+decisions that require human product or engineering intent. Run VCP Doctor when done.
 ```
 
-Fill its outcome, Source of Truth, acceptance criteria, scope, security decisions, failure modes, tests, rollout/recovery, and implementation plan.
+The agent should inspect the repository and draft the relevant files, including:
+
+- `docs/product/PRODUCT-BRIEF.md`
+- `docs/product/PRD.md`
+- `docs/product/USER-FLOWS.md`
+- `docs/architecture/DOMAIN.md`
+- `docs/architecture/ARCHITECTURE.md`
+- `docs/architecture/DATA-MODEL.md`
+- `docs/security/THREAT-MODEL.md`
+- `docs/testing/TEST-STRATEGY.md`
+- `AGENTS.md`
+
+Your job is to approve or correct decisions the repository cannot establish safely. The agent should not ask you to write information it can reliably discover or draft itself.
+
+## 3. Start a bounded feature through the agent
+
+Tell your agent what you want in normal product language. For example:
+
+```text
+Use VCP and add organization invitation acceptance. The invited verified user should
+be able to accept one valid invitation exactly once.
+```
+
+The agent should create the task:
+
+```bash
+vcp task accept-invite --title "Accept organization invitation"
+```
+
+Then it should draft the task contract: outcome, Source of Truth, acceptance criteria, scope, affected boundaries, security/privacy decisions, failure modes, tests, rollout/recovery, and implementation plan.
+
+If product intent is genuinely ambiguous, the agent should ask focused questions instead of guessing.
 
 ## 4. Gate planning readiness
 
-Before asking an AI agent to plan:
+The agent runs:
 
 ```bash
-npx vibe-coding-production ready accept-invite --stage plan
+vcp ready accept-invite --stage plan
 ```
 
-Do not continue while blocking findings remain.
+Blocking findings mean the task is not ready to plan. The agent should resolve findings from repository evidence where possible and ask you only for unresolved human decisions.
 
 ## 5. Build the planning context
 
+The agent runs:
+
 ```bash
-npx vibe-coding-production context accept-invite --mode plan
+vcp context accept-invite --mode plan
 ```
 
-The context pack includes repository rules, the task, the planning prompt, and existing Source of Truth references from the task. It does not dump the whole repository.
+The context pack includes repository rules, the task, the planning prompt, and Source of Truth references from the task. It does not dump the whole repository.
 
-Review and approve the plan before implementation.
+The agent produces a bounded implementation plan. You review important product or architectural decisions and approve or correct them.
 
 ## 6. Gate implementation readiness
 
-After the plan is explicit:
+After the plan is explicit, the agent runs:
 
 ```bash
-npx vibe-coding-production ready accept-invite --stage implement
+vcp ready accept-invite --stage implement
 ```
 
-The implementation gate is intentionally stricter than the planning gate.
+The implementation gate is stricter than the planning gate. It also requires the task to contain an executable verification plan, so a task cannot be reported implementation-ready if `vcp verify` would be unable to run.
 
 ## 7. Build implementation context
 
-Add only the files the approved plan needs:
+The agent adds only the files required by the approved plan:
 
 ```bash
-npx vibe-coding-production context accept-invite \
+vcp context accept-invite \
   --mode implement \
   --include src/invitations/service.ts \
   --include test/invitations/service.test.ts
 ```
 
-Use the output with your coding agent. Keep implementation bounded to the task contract.
+The agent implements only the approved task scope.
 
 ## 8. Preview verification
 
-Before executing repository-controlled commands:
+Before executing repository-controlled commands, the agent runs:
 
 ```bash
-npx vibe-coding-production verify accept-invite
+vcp verify accept-invite
 ```
 
-Preview is safe by default and does not run the commands.
+Preview is safe by default and does not execute commands.
 
 ## 9. Run verification and keep evidence
 
-After reviewing the command list:
+After the command list is known, the agent runs:
 
 ```bash
-npx vibe-coding-production verify accept-invite \
+vcp verify accept-invite \
   --run \
   --output .vcp/evidence/accept-invite.json
 ```
@@ -123,8 +141,10 @@ Verification runs sequentially, stops after the first failure, and records mecha
 
 ## 10. Build independent review context
 
+The agent runs:
+
 ```bash
-npx vibe-coding-production context accept-invite \
+vcp context accept-invite \
   --mode review \
   --include src/invitations/service.ts \
   --include test/invitations/service.test.ts
@@ -134,16 +154,32 @@ Prefer a fresh agent/context for review rather than relying only on the agent th
 
 ## 11. Audit the repository before merge/release
 
+The agent runs:
+
 ```bash
-npx vibe-coding-production doctor .
+vcp doctor .
 ```
 
 Use `--strict` when warnings should block your team or CI policy.
 
-## The complete loop
+## Human experience vs agent workflow
+
+What the developer should experience:
 
 ```text
-Source of Truth
+State intent
+   ↓
+Answer only unresolved product/engineering decisions
+   ↓
+Review the proposed plan
+   ↓
+Review the final result and evidence
+```
+
+What the coding agent should execute behind that experience:
+
+```text
+Inspect repository / draft Source of Truth
       ↓
 vcp task <slug>
       ↓
@@ -151,7 +187,7 @@ vcp ready <slug> --stage plan
       ↓
 vcp context <slug> --mode plan
       ↓
-Approve plan
+Plan / human decision approval
       ↓
 vcp ready <slug> --stage implement
       ↓
