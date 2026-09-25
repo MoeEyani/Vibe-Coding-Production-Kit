@@ -41,16 +41,33 @@ vcp context docs/tasks/accept-invite.md --mode implement
 
 ## Explicit implementation context
 
-Source-of-truth documents describe intent and constraints, but a reviewer or implementer may need a small amount of current code context. The agent should add only the files required by the approved plan:
+Source-of-truth documents describe intent and constraints, but an implementer or reviewer may need a small amount of current code context.
+
+Use repeatable `--include` flags only for repository-local files that already exist and whose current contents belong in the context pack:
 
 ```bash
 vcp context accept-invite \
-  --mode review \
-  --include src/invitations/service.ts \
-  --include test/invitations/service.test.ts
+  --mode implement \
+  --include src/invitations/repository.ts
 ```
 
-`--include` is repeatable. Paths must stay inside the repository root.
+For greenfield implementation files that do **not** exist yet, use repeatable `--planned` flags in `implement` mode:
+
+```bash
+vcp context accept-invite \
+  --mode implement \
+  --planned src/invitations/service.ts \
+  --planned test/invitations/service.test.ts
+```
+
+A planned path is recorded in the context pack and manifest as an approved repository-local implementation path, but no file contents are included because the file does not exist yet. This lets the agent build implement context before creating greenfield files.
+
+The distinction is deliberate:
+
+- `--include <path>` means **this file exists; include its contents**;
+- `--planned <path>` means **this implement-mode path is approved but does not exist yet**.
+
+`--planned` is rejected outside `implement` mode. It is also rejected when the path already exists; use `--include` in that case. Both options reject paths outside the repository root. Review context remains strict: changed files should exist by review time and should be passed with `--include`.
 
 ## Write a reusable pack
 
@@ -92,10 +109,11 @@ The command rejects:
 - task paths outside the repository;
 - source-of-truth references that escape the repository root;
 - explicit includes outside the repository;
+- planned paths outside the repository;
 - output paths outside the repository;
 - URL references as local files.
 
-This prevents a task document from accidentally causing the context builder to read unrelated local files.
+This prevents a task document or context option from accidentally causing the context builder to read or authorize unrelated local paths.
 
 ## Recommended phase loop
 
@@ -124,7 +142,7 @@ Plan + human decision approval
       ↓
 vcp ready <slug> --stage implement
       ↓
-vcp context <slug> --mode implement --include <affected files>
+vcp context <slug> --mode implement [--include <existing affected files>] [--planned <new files>]
       ↓
 Implement bounded scope
       ↓
