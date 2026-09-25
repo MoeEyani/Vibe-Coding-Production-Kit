@@ -65,6 +65,53 @@ test('context pack supports explicit includes and safe repository-local output',
   );
 });
 
+test('implement context supports explicit planned paths for greenfield files', async () => {
+  const target = await tempDir();
+  await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await createTaskPack({ targetDir: target, slug: 'greenfield-service' });
+
+  const result = await createContextPack({
+    targetDir: target,
+    task: 'greenfield-service',
+    mode: 'implement',
+    planned: ['src/service.mjs', 'test/service.test.mjs']
+  });
+
+  assert.deepEqual(result.planned, ['src/service.mjs', 'test/service.test.mjs']);
+  assert.match(result.content, /## Planned implementation paths/);
+  assert.match(result.content, /`src\/service\.mjs` — planned path/);
+  assert.match(result.content, /`test\/service\.test\.mjs` — planned path/);
+  assert.equal(result.files.includes('src/service.mjs'), false);
+});
+
+test('planned paths are implement-only and must not already exist', async () => {
+  const target = await tempDir();
+  await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await createTaskPack({ targetDir: target, slug: 'planned-guard' });
+  await mkdir(path.join(target, 'src'), { recursive: true });
+  await writeFile(path.join(target, 'src', 'existing.mjs'), 'export const value = 1;\n');
+
+  await assert.rejects(
+    createContextPack({
+      targetDir: target,
+      task: 'planned-guard',
+      mode: 'review',
+      planned: ['src/future.mjs']
+    }),
+    /--planned is only supported in implement context mode/
+  );
+
+  await assert.rejects(
+    createContextPack({
+      targetDir: target,
+      task: 'planned-guard',
+      mode: 'implement',
+      planned: ['src/existing.mjs']
+    }),
+    /Planned path already exists: src\/existing\.mjs\. Use --include/
+  );
+});
+
 test('context pack rejects repository escape paths and enforces the context budget', async () => {
   const target = await tempDir();
   await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
@@ -72,6 +119,11 @@ test('context pack rejects repository escape paths and enforces the context budg
 
   await assert.rejects(
     createContextPack({ targetDir: target, task: 'safe-context', includes: ['../outside.md'] }),
+    /escapes the repository root/
+  );
+
+  await assert.rejects(
+    createContextPack({ targetDir: target, task: 'safe-context', mode: 'implement', planned: ['../future.mjs'] }),
     /escapes the repository root/
   );
 
@@ -86,21 +138,38 @@ test('context pack exposes portable slash-separated paths on every OS', async ()
   await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
   await createTaskPack({ targetDir: target, slug: 'portable-context' });
 
-  const result = await createContextPack({ targetDir: target, task: 'portable-context', mode: 'implement' });
+  const result = await createContextPack({
+    targetDir: target,
+    task: 'portable-context',
+    mode: 'implement',
+    planned: ['src/new-service.mjs']
+  });
   assert.equal(result.task, 'docs/tasks/portable-context.md');
   assert.ok(result.files.every((relative) => !relative.includes('\\')));
+  assert.ok(result.planned.every((relative) => !relative.includes('\\')));
   assert.match(result.content, /Task: `docs\/tasks\/portable-context\.md`/);
   assert.match(result.content, /Source: `prompts\/03-implement-task\.md`/);
 });
 
-test('context CLI emits a usable bounded pack', async () => {
+test('context CLI emits a usable bounded pack with planned paths', async () => {
   const target = await tempDir();
   await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
   await createTaskPack({ targetDir: target, slug: 'context-cli' });
 
   const bin = path.resolve('bin/vibe-coding-production.mjs');
-  const { stdout } = await execFileAsync(process.execPath, [bin, 'context', 'context-cli', '--dir', target, '--mode', 'implement']);
+  const { stdout } = await execFileAsync(process.execPath, [
+    bin,
+    'context',
+    'context-cli',
+    '--dir',
+    target,
+    '--mode',
+    'implement',
+    '--planned',
+    'src/context-cli.mjs'
+  ]);
   assert.match(stdout, /# VCP Context Pack — implement/);
   assert.match(stdout, /Prompt: Implement an Approved Task/);
   assert.match(stdout, /docs\/tasks\/context-cli\.md/);
+  assert.match(stdout, /src\/context-cli\.mjs/);
 });
