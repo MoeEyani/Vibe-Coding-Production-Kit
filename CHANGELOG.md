@@ -5,6 +5,22 @@ All notable changes to this project will be documented here.
 ## [Unreleased]
 
 ### Added
+- Explicit `vcp context --planned <path>` support for greenfield implementation paths that do not exist yet, without weakening strict `--include` behavior for existing files.
+- Doctor coverage metadata in human-readable and JSON reports, including which core documents receive starter-template marker checks and which installed decision documents remain outside that completeness check.
+- Explicit lifecycle migration from `0.9.1` to `0.9.2`, preserving composition from older `0.9.0` and `0.8.0` projects.
+
+### Changed
+- Agent-first workflow guidance now distinguishes existing implementation context (`--include`) from approved future paths (`--planned`).
+- `doctor --strict` documentation now states that green means all declared doctor checks are green, not that every VCP-installed template has been customized.
+
+### Fixed
+- Greenfield tasks no longer need to create source/test files before rendering their implementation context pack.
+- The documented implement-context phase loop now matches the CLI contract for files that do not exist yet.
+- Doctor output no longer leaves its starter-template coverage boundary implicit.
+
+## [0.9.1] - 2026-09-25
+
+### Added
 - Evidence-based JavaScript/Node.js stack detection for repositories with `package.json` but no TypeScript marker, including existing `check`, `test`, build, integration, and E2E scripts where present.
 - Shared verification-command parsing used by task generation and verification planning.
 - Task-readiness detection for duplicated level-two sections that would make Markdown parsing ambiguous.
@@ -69,6 +85,9 @@ All notable changes to this project will be documented here.
 - Repeatable `--only` command selection and per-command `--timeout-ms`.
 - Preflight output-path and overwrite protection before any command execution.
 - Verification tests covering preview safety, successful evidence, failure stopping, JSON CLI output, output conflicts, and unready-task refusal.
+
+### Changed
+- `vcp verify <task> --run` requires the task to pass implementation readiness before executing project commands.
 
 ## [0.7.0] - 2026-09-22
 
