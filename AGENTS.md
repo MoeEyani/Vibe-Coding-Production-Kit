@@ -195,7 +195,7 @@ The developer should make product and engineering decisions; the coding agent sh
 - Run `vcp ready <task> --stage plan`; resolve what can be resolved from the repository and ask the developer only for remaining human-intent decisions.
 - Build the planning context with `vcp context <task> --mode plan` and produce a bounded plan before code changes.
 - After plan approval, run `vcp ready <task> --stage implement` and do not implement while blocking findings remain.
-- Build implementation context with only the affected files needed by the approved plan.
+- Build implementation context with only the affected paths needed by the approved plan: use `--include` for files that already exist and `--planned` for approved greenfield paths that do not exist yet.
 - Implement only the approved scope.
 - Preview `vcp verify <task>` before execution, then run verification with explicit `--run` and retain evidence when useful.
 - Build review context and perform an independent review before claiming completion.

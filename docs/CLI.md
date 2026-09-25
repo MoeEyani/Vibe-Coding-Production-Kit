@@ -112,7 +112,7 @@ vcp doctor .
 
 In addition to engineering-system checks, v0.9 validates lifecycle state, manifest compatibility, baseline integrity, and interrupted/corrupt update transactions.
 
-See [`DOCTOR.md`](DOCTOR.md) for JSON output and strict CI behavior.
+See [`DOCTOR.md`](DOCTOR.md) for JSON output, strict CI behavior, and the exact coverage boundary of starter-template checks.
 
 ## Interactive setup
 
@@ -175,7 +175,16 @@ The implementation gate additionally requires resolved architecture/data/integra
 npx vibe-coding-production context accept-invite --mode plan
 ```
 
-`context` combines the task, `AGENTS.md`, the phase-specific operating prompt, and existing files referenced in the task's Source of Truth. Add current implementation files explicitly with repeatable `--include` flags. Print to stdout or use `--output` to save a pack inside the repository. See [`CONTEXT-PACKS.md`](CONTEXT-PACKS.md).
+`context` combines the task, `AGENTS.md`, the phase-specific operating prompt, and existing files referenced in the task's Source of Truth. Add existing implementation files explicitly with repeatable `--include` flags. For greenfield files that do not exist yet, use repeatable `--planned` flags in `implement` mode so their approved paths appear in the pack without pretending contents exist. Print to stdout or use `--output` to save a pack inside the repository. See [`CONTEXT-PACKS.md`](CONTEXT-PACKS.md).
+
+Example greenfield implement pack:
+
+```bash
+vcp context accept-invite --mode implement \
+  --include src/invitations/repository.ts \
+  --planned src/invitations/service.ts \
+  --planned test/invitations/service.test.ts
+```
 
 ## Turn verification into evidence
 
@@ -233,7 +242,8 @@ Before using bootstrap `--force`, inspect the reported conflicts. The CLI never 
 --stage <name>     readiness stage: plan | implement
 --dir <path>       task/ready/context/manage target repository
 --mode <name>      context mode: plan | implement | review | security | release
---include <path>   add an explicit context file; repeatable
+--include <path>   add an existing explicit context file; repeatable
+--planned <path>   implement context: declare a future repository-local path; repeatable
 --output <path>    write context/evidence inside the repository
 --max-bytes <n>    maximum context pack bytes; 0 disables the limit
 --help, -h         show help
