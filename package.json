@@ -4,8 +4,8 @@
   "description": "Production-grade vibe coding framework and CLI: specs, architecture, agent rules, testing, security, reviews, delivery, and safe lifecycle updates from idea to production.",
   "type": "module",
   "bin": {
-    "vibe-coding-production": "./bin/vibe-coding-production.mjs",
-    "vcp": "./bin/vibe-coding-production.mjs"
+    "vibe-coding-production": "bin/vibe-coding-production.mjs",
+    "vcp": "bin/vibe-coding-production.mjs"
   },
   "files": [
     "bin/",
