@@ -94,7 +94,7 @@ test('doctor fails when an interrupted update transaction is present', async () 
   assert.match(transaction.detail, /Incomplete VCP update transaction/);
 });
 
-test('0.8 manifest migrates transactionally to 0.9 and can roll back', async () => {
+test('0.8 manifest migrates transactionally to the current 0.9 release and can roll back', async () => {
   const root = await tempDir();
   await initProject({ targetDir: root, agent: 'generic', stack: 'generic', includeGitHub: false });
   const oldManifest = await manifest(root);
@@ -105,7 +105,7 @@ test('0.8 manifest migrates transactionally to 0.9 and can roll back', async () 
   const applied = await applyUpdate({ targetDir: root });
   assert.equal(applied.applied, true);
   assert.equal(applied.blocked, false);
-  assert.equal((await manifest(root)).installedVersion, '0.9.0');
+  assert.equal((await manifest(root)).installedVersion, '0.9.1');
   assert.ok(applied.backupId);
 
   const rolledBack = await rollbackProject({ targetDir: root, backupId: applied.backupId });

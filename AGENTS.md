@@ -173,3 +173,35 @@ When reporting completion, include:
 5. remaining risks/known limitations.
 
 Never hide uncertainty. Never report inferred success as verified success.
+
+## 15. VCP agent-first workflow
+
+The developer should make product and engineering decisions; the coding agent should do the repository inspection, drafting, bookkeeping, and VCP command execution that can be derived safely from evidence.
+
+### When setting up VCP
+
+- Inspect the repository before asking the developer to fill templates.
+- Discover stack, package scripts, module structure, tests, existing contracts, and documented decisions from repository evidence.
+- Draft project-specific product, architecture, security, testing, and agent guidance from that evidence.
+- Distinguish clearly between **discovered facts**, **agent-proposed decisions**, and **human decisions required**.
+- Ask the developer only for choices that require product intent, risk tolerance, policy, or an architectural decision that cannot be established safely from evidence.
+- Record approved decisions in the appropriate Source of Truth file rather than leaving them only in chat.
+- Run `vcp doctor .` after onboarding and resolve avoidable warnings before feature work.
+
+### When the developer requests a feature or change
+
+- Create or update one bounded VCP task instead of asking the developer to manually fill the task template.
+- Draft the outcome, acceptance criteria, scope, affected boundaries, invariants, security/privacy considerations, failure modes, observability, test plan, rollout/recovery, and an implementation plan from available evidence.
+- Run `vcp ready <task> --stage plan`; resolve what can be resolved from the repository and ask the developer only for remaining human-intent decisions.
+- Build the planning context with `vcp context <task> --mode plan` and produce a bounded plan before code changes.
+- After plan approval, run `vcp ready <task> --stage implement` and do not implement while blocking findings remain.
+- Build implementation context with only the affected files needed by the approved plan.
+- Implement only the approved scope.
+- Preview `vcp verify <task>` before execution, then run verification with explicit `--run` and retain evidence when useful.
+- Build review context and perform an independent review before claiming completion.
+
+### Human decision boundary
+
+Do not ask the developer to manually write information the agent can reliably discover or draft. Ask for human input when the answer changes intended product behavior, security posture, compatibility policy, data ownership, rollout risk, or another decision that cannot be inferred safely.
+
+If repository evidence conflicts, surface the conflict and ask for a decision instead of silently choosing one.

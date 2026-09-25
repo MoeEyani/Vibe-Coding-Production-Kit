@@ -88,7 +88,30 @@ test('auto-detects TypeScript and fills commands proven by package scripts', asy
   assert.equal(result.stack, 'typescript');
   assert.match(agents, /LINT_COMMAND=npm run lint/);
   assert.match(agents, /TYPECHECK_COMMAND=npm run typecheck/);
-  assert.match(agents, /## 15\. TypeScript stack profile/);
+  assert.match(agents, /## 16\. TypeScript stack profile/);
+});
+
+test('auto-detects JavaScript package projects and imports existing check/test scripts', async () => {
+  const target = await tempDir();
+  await writeFile(path.join(target, 'package.json'), JSON.stringify({
+    type: 'module',
+    scripts: {
+      test: 'node --test',
+      check: 'node --check src/app.js'
+    }
+  }));
+
+  const result = await initProject({ targetDir: target, agent: 'codex', stack: 'auto', includeGitHub: false });
+  const agents = await readFile(path.join(target, 'AGENTS.md'), 'utf8');
+
+  assert.equal(result.stack, 'javascript');
+  assert.match(agents, /INSTALL_COMMAND=npm install/);
+  assert.match(agents, /LINT_COMMAND=npm run check/);
+  assert.match(agents, /UNIT_TEST_COMMAND=npm run test/);
+  assert.match(agents, /FORMAT_CHECK_COMMAND=n\/a/);
+  assert.match(agents, /TYPECHECK_COMMAND=n\/a/);
+  assert.match(agents, /BUILD_COMMAND=n\/a/);
+  assert.match(agents, /## 16\. JavaScript \/ Node\.js stack profile/);
 });
 
 test('Go stack installs stable verification commands', async () => {
@@ -101,7 +124,7 @@ test('Go stack installs stable verification commands', async () => {
   assert.equal(result.stack, 'go');
   assert.match(agents, /LINT_COMMAND=go vet \.\/\.\.\./);
   assert.match(agents, /BUILD_COMMAND=go build \.\/\.\.\./);
-  assert.match(agents, /## 15\. Go stack profile/);
+  assert.match(agents, /## 16\. Go stack profile/);
 });
 
 test('auto-detects Python tooling only when configuration provides evidence', async () => {
@@ -117,7 +140,7 @@ test('auto-detects Python tooling only when configuration provides evidence', as
   assert.match(agents, /LINT_COMMAND=ruff check \./);
   assert.match(agents, /TYPECHECK_COMMAND=mypy \./);
   assert.match(agents, /UNIT_TEST_COMMAND=python -m pytest/);
-  assert.match(agents, /## 15\. Python stack profile/);
+  assert.match(agents, /## 16\. Python stack profile/);
 });
 
 test('doctor fails when the framework is not installed', async () => {
@@ -191,6 +214,33 @@ test('task generator creates a bounded task and imports configured verification 
   assert.match(task, /`TYPECHECK_COMMAND`: `npm run typecheck`/);
   assert.match(task, /Implementation plan/);
   assert.match(task, /Independent review checklist/);
+});
+
+test('task generator does not turn reasoned n/a decisions into executable commands', async () => {
+  const target = await tempDir();
+  await initProject({ targetDir: target, agent: 'generic', stack: 'generic', includeGitHub: false });
+  await writeFile(path.join(target, 'AGENTS.md'), [
+    'INSTALL_COMMAND=npm install',
+    'FORMAT_CHECK_COMMAND=n/a — no formatter configured',
+    'LINT_COMMAND=npm run check',
+    'TYPECHECK_COMMAND=n/a - plain JavaScript',
+    'UNIT_TEST_COMMAND=npm test',
+    'INTEGRATION_TEST_COMMAND=not applicable — no integrations',
+    'BUILD_COMMAND=n/a — no build step',
+    'E2E_COMMAND=n/a — no UI'
+  ].join('\n') + '\n');
+
+  const result = await createTaskPack({ targetDir: target, slug: 'reasoned-na' });
+  const task = await readFile(path.join(target, result.relative), 'utf8');
+
+  assert.match(task, /`INSTALL_COMMAND`: `npm install`/);
+  assert.match(task, /`LINT_COMMAND`: `npm run check`/);
+  assert.match(task, /`UNIT_TEST_COMMAND`: `npm test`/);
+  assert.doesNotMatch(task, /FORMAT_CHECK_COMMAND/);
+  assert.doesNotMatch(task, /TYPECHECK_COMMAND/);
+  assert.doesNotMatch(task, /INTEGRATION_TEST_COMMAND/);
+  assert.doesNotMatch(task, /BUILD_COMMAND/);
+  assert.doesNotMatch(task, /E2E_COMMAND/);
 });
 
 test('task generator refuses overwrite and supports dry-run', async () => {

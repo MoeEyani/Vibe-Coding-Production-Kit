@@ -5,12 +5,20 @@ Use this repository as a repeatable engineering operating system for AI-assisted
 For a new repository, the fastest start is:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all
+npx vibe-coding-production init . --agent all --stack auto --yes
+```
+
+If you intentionally want the current GitHub source instead of the published npm package:
+
+```bash
+npx --yes github:Moeeryani/Vibe-Coding-Production-Kit init . --agent all --stack auto --yes
 ```
 
 See `docs/CLI.md` for safe overwrite behavior, tool adapters, and non-interactive options.
 
 ## Recommended order
+
+The checklist below describes engineering state that should exist before production work. It is **not** a form-filling checklist for the developer. Your coding agent should inspect repository evidence, draft these artifacts, run VCP gates, and ask you only for decisions that require human product or engineering intent.
 
 ### Before code
 
@@ -49,12 +57,53 @@ See `docs/CLI.md` for safe overwrite behavior, tool adapters, and non-interactiv
 - [ ] Observability in place
 - [ ] Critical journeys verified
 
-## Day-to-day feature work
+## Agent-first setup
 
-Once the source-of-truth documents are established, create bounded implementation work with:
+After `vcp init`, tell the coding agent to inspect the repository and establish VCP from evidence. A useful instruction is:
 
-```bash
-vcp task feature-slug --title "Feature outcome"
+```text
+Set up VCP for this repository. Inspect the existing code, package scripts, tests,
+architecture, and documentation. Draft the Source of Truth from repository evidence.
+Distinguish discovered facts from proposed decisions, ask me only for unresolved
+human-intent decisions, and run vcp doctor . when done.
 ```
 
-Then fill the generated implementation plan before editing code, implement only that scope, run the embedded verification commands, request independent review, and use `vcp doctor .` to audit the repository engineering system.
+The agent should write the drafts and update `AGENTS.md`; the developer approves or corrects decisions that cannot be established safely from repository evidence.
+
+## Day-to-day feature work
+
+Once the Source of Truth is established, state the feature intent normally, for example:
+
+```text
+Use VCP and add verified email change. Draft the bounded task, run readiness,
+ask me only for unresolved product/engineering decisions, plan before coding,
+implement the approved scope, verify it, and perform an independent review.
+```
+
+Behind that interaction, the coding agent should drive:
+
+```text
+vcp task <slug>
+      ↓
+vcp ready <slug> --stage plan
+      ↓
+vcp context <slug> --mode plan
+      ↓
+plan + human decision approval
+      ↓
+vcp ready <slug> --stage implement
+      ↓
+vcp context <slug> --mode implement --include <affected files>
+      ↓
+implement
+      ↓
+vcp verify <slug>
+      ↓
+vcp verify <slug> --run
+      ↓
+vcp context <slug> --mode review --include <changed files/tests>
+      ↓
+vcp doctor .
+```
+
+The developer should not have to manually populate information the agent can reliably discover or draft.

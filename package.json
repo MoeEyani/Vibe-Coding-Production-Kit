@@ -1,11 +1,11 @@
 {
   "name": "vibe-coding-production",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Production-grade vibe coding framework and CLI: specs, architecture, agent rules, testing, security, reviews, delivery, and safe lifecycle updates from idea to production.",
   "type": "module",
   "bin": {
-    "vibe-coding-production": "./bin/vibe-coding-production.mjs",
-    "vcp": "./bin/vibe-coding-production.mjs"
+    "vibe-coding-production": "bin/vibe-coding-production.mjs",
+    "vcp": "bin/vibe-coding-production.mjs"
   },
   "files": [
     "bin/",
@@ -46,12 +46,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MoeEyani/Vibe-Coding-Production-Kit.git"
+    "url": "git+https://github.com/Moeeryani/Vibe-Coding-Production-Kit.git"
   },
   "bugs": {
-    "url": "https://github.com/MoeEyani/Vibe-Coding-Production-Kit/issues"
+    "url": "https://github.com/Moeeryani/Vibe-Coding-Production-Kit/issues"
   },
-  "homepage": "https://github.com/MoeEyani/Vibe-Coding-Production-Kit#readme",
+  "homepage": "https://github.com/Moeeryani/Vibe-Coding-Production-Kit#readme",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

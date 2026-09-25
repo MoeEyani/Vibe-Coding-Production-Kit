@@ -31,13 +31,42 @@ npx vibe-coding-production init . --agent all --stack auto --dry-run
 إذا أردت تشغيل المصدر الحالي من GitHub بدلاً من الحزمة المنشورة:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
+npx --yes github:Moeeryani/Vibe-Coding-Production-Kit \
   init . --agent all --stack auto --yes
 ```
 
-المتطلبات: **Node.js 22+**. الـCLI لا يملك runtime dependencies خارجية.
+المتطلبات: **Node.js 22+**. الـCLI لا يملك runtime dependencies خارجية، ويستطيع اكتشاف JavaScript/Node.js وTypeScript وPython وGo من أدلة المستودع.
 
 إذا كانت هذه أول مرة تستخدم المشروع، ابدأ من [`docs/QUICKSTART.md`](docs/QUICKSTART.md).
+
+## استخدم VCP من خلال الـAI Agent
+
+VCP ليس مصمماً ليحوّل المطور إلى شخص يملأ عشرات ملفات Markdown. الاستخدام الأفضل هو أن تجعل Claude Code أو Codex أو Cursor أو أي Coding Agent متوافق يقود VCP نيابة عنك.
+
+بعد التهيئة قل للوكيل مثلاً:
+
+```text
+جهّز هذا المستودع للعمل باستخدام VCP. افحص الكود الحالي وpackage scripts
+والاختبارات والمعمارية والتوثيق. اكتب مسودات Source of Truth من أدلة المستودع.
+فرّق بين الحقائق المكتشفة والقرارات المقترحة والقرارات التي تحتاج نية بشرية.
+اسألني فقط عن القرارات التي لا يمكن استنتاجها بأمان. ثم شغّل VCP Doctor.
+```
+
+وعند طلب Feature:
+
+```text
+استخدم VCP وأضف تغيير البريد بعد التحقق منه. أنشئ الـTask وحدد القبول والنطاق
+والمخاطر والاختبارات، شغّل readiness، واسألني فقط عن قرارات المنتج غير المحسومة،
+ثم خطط ونفّذ وتحقق وراجع النتيجة.
+```
+
+التقسيم المطلوب هو:
+
+```text
+الـAI يفحص ويكتب المسودات ويشغّل أوامر VCP.
+الإنسان يحدد نية المنتج والقرارات والمفاضلات المهمة.
+VCP يحفظ هذه القرارات ويمنع التنفيذ غير الجاهز ويوثق التحقق.
+```
 
 ## لماذا هذا مختلف عن Vibe Coding العادي؟
 
@@ -56,8 +85,22 @@ npx --yes github:MoeEyani/Vibe-Coding-Production-Kit \
 
 ## المسار اليومي
 
+ما يفترض أن يراه المطور:
+
 ```text
-init
+يصف المطلوب
+  ↓
+يجيب فقط عن القرارات البشرية غير المحسومة
+  ↓
+يراجع ويوافق على الخطة
+  ↓
+يراجع النتيجة وVerification Evidence
+```
+
+أما الوكيل فينفذ خلف ذلك:
+
+```text
+inspect / init
   ↓
 task
   ↓
@@ -141,7 +184,7 @@ VCP يقارن ثلاث نسخ:
 ```text
 baseline = النسخة التي ثبتها VCP سابقاً
 local    = نسخة المشروع الحالية
- target   = Template الإصدار الجديد
+target   = Template الإصدار الجديد
 ```
 
 إذا كانت التعديلات مستقلة يمكن دمجها تلقائياً. إذا تداخلت، تصبح `CONFLICT` بدلاً من اختيار نسخة عشوائياً.
@@ -216,6 +259,16 @@ vcp task accept-invite --title "Accept invitation"
 - Independent review checklist؛
 - أوامر التحقق الفعلية من `AGENTS.md`.
 
+لكن المقصود ليس أن يفتح المطور الملف ويملأه يدوياً. الـAI Agent هو الذي يكتب المسودة من أدلة المشروع، ثم يعرض فقط القرارات التي تحتاج موافقة بشرية.
+
+كما أن القيم مثل:
+
+```text
+E2E_COMMAND=n/a — لا توجد واجهة E2E في هذا المشروع
+```
+
+تُعامل كقرار non-applicable ولا تتحول إلى shell command داخل الـTask.
+
 ## افصل الجاهزية للتخطيط عن الجاهزية للتنفيذ
 
 ```bash
@@ -223,9 +276,19 @@ vcp ready accept-invite --stage plan
 vcp ready accept-invite --stage implement
 ```
 
-`plan` يتأكد أن المشكلة والنطاق ومعايير القبول ومصادر الحقيقة جاهزة.
+`plan` يتأكد أن المشكلة والنطاق ومعايير القبول ومصادر الحقيقة جاهزة، ويرفض أيضاً تكرار أقسام الـTask بشكل يجعل parsing غامضاً.
 
-`implement` أكثر صرامة، ويشترط أيضاً حسم الحدود المعمارية، invariants، الأمن والخصوصية، الحالات السلبية، observability، الاختبارات، rollout/recovery، وخطة تنفيذ فعلية.
+إذا كانت ملفات Source of Truth المشار إليها ما زالت Starter Templates، يظهر ذلك كـ`WARN` حتى لا يتعامل النظام مع وجود ملف فارغ كأنه قرار مشروع حقيقي.
+
+`implement` أكثر صرامة، ويشترط أيضاً حسم الحدود المعمارية، invariants، الأمن والخصوصية، الحالات السلبية، observability، الاختبارات، rollout/recovery، وخطة تنفيذ فعلية، بالإضافة إلى Verification Plan قابلة للتنفيذ.
+
+هذا يمنع الحالة التي يكون فيها:
+
+```text
+ready --stage implement = PASS
+```
+
+ثم يفشل `vcp verify` لأنه لا يملك أي أوامر تحقق فعلية.
 
 ## أعطِ الـAI أقل Context كافٍ
 
@@ -291,7 +354,11 @@ npm run check
 
 **لا تطلب من الـAI أن يبني المشروع؛ ابنِ نظاماً يجعل من الصعب عليه أن يبنيه بطريقة خاطئة.**
 
-الإنسان يملك النية والقرارات والمفاضلات والمخاطر. والـAI يساعد في البحث والتخطيط والتنفيذ والاختبار والمراجعة والتوثيق والأتمتة داخل حدود واضحة.
+الإنسان يملك النية والقرارات والمفاضلات والمخاطر. والـAI يتولى ما يمكنه اكتشافه وصياغته بأمان: فحص المشروع، كتابة المسودات، التخطيط، التنفيذ، الاختبار، المراجعة، التوثيق والأتمتة داخل حدود واضحة.
+
+القاعدة العملية:
+
+> لا تطلب من المطور كتابة معلومة يستطيع الوكيل اكتشافها أو صياغة مسودة موثوقة لها. اسأل المطور فقط عندما تكون الإجابة قرار منتج أو هندسة يحتاج نية بشرية.
 
 ## دورة المشروع الكاملة
 
@@ -319,7 +386,7 @@ npm run check
 
 ## أهم ما يوفره المشروع
 
-- `AGENTS.md`: قواعد المستودع لوكلاء البرمجة.
+- `AGENTS.md`: قواعد المستودع وبروتوكول AI-first لوكلاء البرمجة.
 - Product/PRD/User Flow templates.
 - Domain/Architecture/Data/ADR templates.
 - Threat Model وTest Strategy.
@@ -333,7 +400,9 @@ npm run check
 - Prompts مستقلة للتخطيط والتنفيذ والمراجعة والأمن والإطلاق.
 - GitHub Issue/PR templates وvalidation workflow.
 
-## املأ Source of Truth بهذا الترتيب
+## أنشئ Source of Truth بمساعدة الوكيل
+
+هذه هي الملفات الأساسية التي يديرها VCP:
 
 1. `docs/product/PRODUCT-BRIEF.md`
 2. `docs/product/PRD.md`
@@ -344,7 +413,7 @@ npm run check
 7. `docs/security/THREAT-MODEL.md`
 8. `docs/testing/TEST-STRATEGY.md`
 
-ثم عدّل `AGENTS.md` بأوامر المشروع الحقيقية للـinstall/format/lint/typecheck/tests/build/E2E.
+**هذه ليست قائمة Form يجب على المطور تعبئتها يدوياً.** دع الـAI Agent يفحص المشروع ويكتب المسودات من الأدلة الموجودة، ثم راجع القرارات التي تحتاج نيتك البشرية فقط. كذلك يجب أن يستخرج `AGENTS.md` أوامر install/lint/check/typecheck/tests/build/E2E من المشروع عندما تكون موجودة، ويترك ما لا يستطيع إثباته واضحاً بدلاً من اختراعه.
 
 ## قواعد لا نتنازل عنها
 
@@ -359,11 +428,12 @@ npm run check
 - لا تعتمد على الوكيل الذي كتب الكود كمراجع وحيد.
 - لا Upgrade عبر نسخ Templates فوق تعديلات المشروع.
 - أي نظام Production يجب أن يكون قابلاً للمراقبة والتشخيص والاسترجاع.
+- لا تجعل المطور يكتب يدوياً ما يستطيع الوكيل اكتشافه أو صياغة مسودته بأمان.
 
 ## Roadmap
 
 - [x] CLI bootstrap
-- [x] TypeScript/Python/Go stack profiles
+- [x] JavaScript/TypeScript/Python/Go stack profiles
 - [x] Task Packs
 - [x] Readiness Gates
 - [x] Context Packs

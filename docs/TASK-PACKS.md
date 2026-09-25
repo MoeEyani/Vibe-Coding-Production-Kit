@@ -4,6 +4,8 @@
 
 The goal is not to generate implementation code. The goal is to create the **bounded context and verification contract** that a coding agent and reviewer need.
 
+The coding agent should draft and maintain the task pack from repository evidence. The developer should be asked only for product or engineering decisions that require human intent.
+
 ## Create a task
 
 ```bash
@@ -13,7 +15,7 @@ vcp task accept-invite --title "Accept organization invitation"
 When running directly from this GitHub repository:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+npx --yes --package=github:Moeeryani/Vibe-Coding-Production-Kit \
   vibe-coding-production task accept-invite \
   --title "Accept organization invitation"
 ```
@@ -60,6 +62,8 @@ vcp task accept-invite --force
 - independent review checklist;
 - completion report.
 
+The agent should populate these sections from existing repository evidence and its bounded analysis. If a decision changes intended product behavior, security posture, compatibility policy, data ownership, or another choice that cannot be inferred safely, the agent should ask the developer a focused question and record the approved answer in the task or governing Source of Truth.
+
 ## Context-aware verification
 
 If `AGENTS.md` contains concrete verification commands, the generator copies the applicable configured commands into the task pack.
@@ -73,22 +77,44 @@ UNIT_TEST_COMMAND=npm test
 BUILD_COMMAND=npm run build
 ```
 
-becomes an explicit task verification section. Placeholder commands and `n/a` entries are not presented as executable checks.
+becomes an explicit task verification section. Placeholder commands and non-applicable entries such as `n/a — no E2E surface` are not presented as executable checks.
 
 This matters because the task should say **what was actually configured**, not invent commands from the language or framework.
 
 ## Recommended daily loop
 
+What the developer does:
+
 ```text
-PRD / ADR / Threat Model
+State feature intent
+      ↓
+Answer only unresolved human decisions
+      ↓
+Approve/correct the plan
+      ↓
+Review final evidence and result
+```
+
+What the coding agent drives:
+
+```text
+Read Source of Truth + inspect affected area
         ↓
 vcp task <slug>
         ↓
-Agent fills Implementation Plan before code
+Draft/update the bounded task from evidence
+        ↓
+vcp ready <slug> --stage plan
+        ↓
+vcp context <slug> --mode plan
+        ↓
+Plan + resolve human decisions
+        ↓
+vcp ready <slug> --stage implement
         ↓
 Implement bounded scope
         ↓
-Run task verification commands
+vcp verify <slug> --run
         ↓
 Independent review
         ↓

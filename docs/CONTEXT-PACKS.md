@@ -4,6 +4,8 @@
 
 The goal is not to dump the repository into an AI chat. The goal is to give a coding agent enough authoritative context to plan, implement, review, or assess risk without losing the task boundary.
 
+The coding agent should normally drive this command itself after it has drafted the task and passed the relevant readiness gate.
+
 ## Basic usage
 
 Create a planning context from a task slug:
@@ -17,7 +19,7 @@ The command reads `docs/tasks/accept-invite.md`, `AGENTS.md`, the planning promp
 Running directly from GitHub:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit \
+npx --yes --package=github:Moeeryani/Vibe-Coding-Production-Kit \
   vibe-coding-production context accept-invite --mode plan
 ```
 
@@ -39,7 +41,7 @@ vcp context docs/tasks/accept-invite.md --mode implement
 
 ## Explicit implementation context
 
-Source-of-truth documents describe intent and constraints, but a reviewer or implementer may need a small amount of current code context. Add it explicitly:
+Source-of-truth documents describe intent and constraints, but a reviewer or implementer may need a small amount of current code context. The agent should add only the files required by the approved plan:
 
 ```bash
 vcp context accept-invite \
@@ -52,7 +54,7 @@ vcp context accept-invite \
 
 ## Write a reusable pack
 
-By default the pack is printed to stdout so it can be pasted or piped into any coding tool. To save it:
+By default the pack is printed to stdout so it can be piped or passed into any coding tool. To save it:
 
 ```bash
 vcp context accept-invite \
@@ -97,18 +99,36 @@ This prevents a task document from accidentally causing the context builder to r
 
 ## Recommended phase loop
 
+What the developer should experience:
+
 ```text
-vcp task <slug>
+State feature intent
       ↓
-Fill task acceptance criteria + Source of Truth
+Answer unresolved human decisions
+      ↓
+Approve/correct the plan
+      ↓
+Review final result and evidence
+```
+
+What the coding agent should execute:
+
+```text
+Inspect repository + draft/update task
+      ↓
+vcp ready <slug> --stage plan
       ↓
 vcp context <slug> --mode plan
       ↓
-Approve the plan
+Plan + human decision approval
+      ↓
+vcp ready <slug> --stage implement
       ↓
 vcp context <slug> --mode implement --include <affected files>
       ↓
-Run verification commands
+Implement bounded scope
+      ↓
+vcp verify <slug> --run
       ↓
 vcp context <slug> --mode review --include <changed files/tests>
       ↓

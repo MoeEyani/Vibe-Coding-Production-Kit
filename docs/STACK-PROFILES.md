@@ -9,17 +9,31 @@ The goal is not to guess a framework. The CLI only fills commands when repositor
 Automatic detection is the default:
 
 ```bash
-npx --yes github:MoeEyani/Vibe-Coding-Production-Kit init . --agent all --stack auto
+npx vibe-coding-production init . --agent all --stack auto
 ```
 
 You can also choose explicitly:
 
 ```bash
+vcp init . --stack javascript
 vcp init . --stack typescript
 vcp init . --stack python
 vcp init . --stack go
 vcp init . --stack generic
 ```
+
+## JavaScript / Node.js
+
+Detection: `package.json` when no TypeScript marker is present.
+
+The profile:
+
+- detects npm, pnpm, Yarn, or Bun from lockfiles;
+- reads `package.json` scripts;
+- maps existing `lint` or general `check` scripts into the lint/static-check slot;
+- detects `test`, `test:unit`, `test:integration`, `build`, `test:e2e`, and `e2e` when present;
+- marks clearly non-applicable checks such as TypeScript type checking as `n/a` instead of forcing the developer to fill irrelevant placeholders;
+- adds JavaScript/Node-specific rules around runtime validation, module contracts, environment dependence, and regression tests.
 
 ## TypeScript
 
@@ -29,10 +43,10 @@ The profile:
 
 - detects npm, pnpm, Yarn, or Bun from lockfiles;
 - reads `package.json` scripts;
-- fills only commands backed by existing scripts such as `lint`, `typecheck`, `test`, `build`, `test:integration`, and `test:e2e`;
+- fills only commands backed by existing scripts such as `lint`, `check`, `typecheck`, `test`, `build`, `test:integration`, and `test:e2e`;
 - adds TypeScript-specific rules around strictness, runtime validation, module boundaries, and async behavior.
 
-If a script does not exist, the CLI leaves the command as `<define>` or `n/a` instead of inventing one.
+If a required script does not exist, the CLI leaves the command as `<define>` instead of inventing one.
 
 ## Python
 
@@ -66,8 +80,8 @@ The profile also adds rules for error wrapping, `context.Context`, goroutine lif
 
 ## Why evidence-based detection matters
 
-A professional bootstrapper should not silently assume that every TypeScript project uses npm, every Python project uses pytest, or every repository has the same scripts. Wrong automation is worse than an explicit placeholder.
+A professional bootstrapper should not silently assume that every Node project uses the same scripts, every Python project uses pytest, or every repository has the same tooling. Wrong automation is worse than an explicit placeholder.
 
 The invariant is:
 
-> Detect what can be proven. Leave the rest for the project owner to define.
+> Detect what can be proven. Ask the developer only for decisions that repository evidence cannot safely establish.
