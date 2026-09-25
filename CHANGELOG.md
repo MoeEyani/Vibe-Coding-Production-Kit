@@ -4,6 +4,8 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-09-25
+
 ### Added
 - Explicit `vcp context --planned <path>` support for greenfield implementation paths that do not exist yet, without weakening strict `--include` behavior for existing files.
 - Doctor coverage metadata in human-readable and JSON reports, including which core documents receive starter-template marker checks and which installed decision documents remain outside that completeness check.
