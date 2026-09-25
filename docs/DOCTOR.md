@@ -15,7 +15,7 @@ vcp doctor .
 From this GitHub repository:
 
 ```bash
-npx --yes --package=github:MoeEyani/Vibe-Coding-Production-Kit vibe-coding-production doctor .
+npx --yes --package=github:Moeeryani/Vibe-Coding-Production-Kit vibe-coding-production doctor .
 ```
 
 Machine-readable output:
@@ -41,10 +41,26 @@ The doctor currently inspects:
 - repository-wide `AGENTS.md`;
 - unresolved verification-command slots in `AGENTS.md`;
 - presence of core product, architecture, security, testing, and delivery documents;
-- known starter-template markers that suggest a document has not been customized yet;
+- known starter-template markers for Product Brief, PRD, Architecture, Threat Model, and Test Strategy;
+- presence of Definition of Ready and Definition of Done;
 - framework validation CI;
 - local validation script;
-- planning and independent-review prompts.
+- planning and independent-review prompts;
+- VCP lifecycle state, manifest/version alignment, baseline integrity, and interrupted update transactions.
+
+## Strict-mode coverage boundary
+
+A green `vcp doctor . --strict` means **all checks currently defined by doctor are green**. It does not mean every VCP-installed document has been customized.
+
+Doctor intentionally reports its starter-template coverage in both human-readable and JSON output. In v0.9.2:
+
+- starter-template markers are checked for 5 core decision documents;
+- Definition of Ready and Definition of Done are presence-only core checks;
+- `docs/product/USER-FLOWS.md`, `docs/architecture/DOMAIN.md`, and `docs/architecture/DATA-MODEL.md` are not assessed for template completeness by doctor.
+
+Those unassessed documents can be important for a specific project, but VCP does not make them universally mandatory because some projects legitimately have no meaningful data model, user flow, or separate domain document. Task readiness and human/agent review must decide when they are required by the work.
+
+This coverage boundary prevents a strict-green report from being interpreted as a claim that every installed template is complete.
 
 ## Result semantics
 
@@ -62,8 +78,8 @@ A foundational control is missing or unusable, such as an absent `AGENTS.md` or 
 
 ## Important limitation
 
-Doctor does **not** certify that a project is secure, correct, compliant, or production-ready. It validates visible engineering signals and configuration. Human review, real tests, threat analysis, operational evidence, and context-specific judgment remain necessary.
+Doctor does **not** certify that a project is secure, correct, compliant, production-ready, or that every VCP-installed artifact has been customized. It validates visible engineering signals within its declared coverage. Human review, real tests, threat analysis, operational evidence, task-specific Source of Truth, and context-specific judgment remain necessary.
 
 ## Why there is no readiness score
 
-A single percentage would hide important differences between projects and can create false confidence. Doctor reports concrete checks and remediation instead, so teams can decide which warnings matter for their context.
+A single percentage would hide important differences between projects and can create false confidence. Doctor reports concrete checks, coverage, and remediation instead, so teams can decide which warnings and unassessed artifacts matter for their context.
