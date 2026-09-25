@@ -106,14 +106,17 @@ The implementation gate is stricter than the planning gate. It also requires the
 
 ## 7. Build implementation context
 
-The agent adds only the files required by the approved plan:
+The agent adds only context required by the approved plan. Existing files use `--include`; greenfield paths that do not exist yet use `--planned`:
 
 ```bash
 vcp context accept-invite \
   --mode implement \
-  --include src/invitations/service.ts \
-  --include test/invitations/service.test.ts
+  --include src/invitations/repository.ts \
+  --planned src/invitations/service.ts \
+  --planned test/invitations/service.test.ts
 ```
+
+`--include` stays strict so a typo is not silently treated as a future file. `--planned` is explicit, implement-mode only, and records the approved future path without inventing file contents.
 
 The agent implements only the approved task scope.
 
@@ -160,7 +163,7 @@ The agent runs:
 vcp doctor .
 ```
 
-Use `--strict` when warnings should block your team or CI policy.
+Use `--strict` when warnings should block your team or CI policy. A strict-green report means doctor’s declared checks are green; it does not claim that every installed VCP template is customized. The report states its starter-template coverage explicitly.
 
 ## Human experience vs agent workflow
 
@@ -191,7 +194,7 @@ Plan / human decision approval
       ↓
 vcp ready <slug> --stage implement
       ↓
-vcp context <slug> --mode implement --include <affected files>
+vcp context <slug> --mode implement [--include <existing files>] [--planned <new files>]
       ↓
 Implement bounded scope
       ↓
